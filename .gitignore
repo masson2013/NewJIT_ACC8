@@ -1,0 +1,5 @@
+*.log
+*.jou
+.Xil
+M505_LX325T_NewJIT_ACC8
+*_bit.h
