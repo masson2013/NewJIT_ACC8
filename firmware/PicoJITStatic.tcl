@@ -24,20 +24,6 @@ update_compile_order -fileset sources_1
 report_ip_status -name ip_status
 upgrade_ip [get_ips *]
 
-# set tmpstr [exec pwd]
-# set ModuleName jit_blackbox
-# set proname [current_project]
-# set current_path $tmpstr/[current_project]
-# set src_path $current_path/$proname.srcs
-# set run_path $current_path/$proname.runs
-# set new_path $src_path/$ModuleName/new
-# set xdc_name $ModuleName\_ooc.xdc
-
-# set_property generate_synth_checkpoint true [get_files $src_path/sources_1/ip/$ModuleName/$ModuleName.xci]
-# generate_target all [get_files $src_path/sources_1/ip/$ModuleName/$ModuleName.xci]
-# create_ip_run [get_files -of_objects [get_fileset sources_1] $src_path/sources_1/ip/$ModuleName/$ModuleName.xci]
-# launch_runs $ModuleName\_synth_1 -jobs 12
-
 set tmpstr [exec pwd]
 set ModuleName jit_blackbox
 set proname [current_project]
@@ -81,16 +67,17 @@ for {set ii 0} {$ii < $LIST_LEN} {incr ii} \
   set_property HD.RECONFIGURABLE 1 [get_cells $prpath]
 }
 
-# set offset {{0 0 0 0} {50 20 20 10} {200 80 80 40} {250 100 100 50} {300 120 120 60}}
-set offsetX {{50 2 2 2} {50  2  2  2} { 50  2  2  2} { 50   2   2  2} { 50   2   2  2} {80 3 3 3}  {80  3  3  3}  { 80  3  3  3}}
-set offsetY {{ 0 0 0 0} {50 20 20 10} {200 80 80 40} {250 100 100 50} {300 120 120 60} { 0 0 0 0}  {50 20 20 10}  {100 40 40 20}}
-set sW 27
+# set offsetX {{50 2 2 2} {50  2  2  2} { 50  2  2  2} { 50   2   2  2} { 50   2   2  2} {80 3 3 3}  {80  3  3  3}  { 80  3  3  3}}
+# set offsetY {{ 0 0 0 0} {50 20 20 10} {200 80 80 40} {250 100 100 50} {300 120 120 60} { 0 0 0 0}  {50 20 20 10}  {100 40 40 20}}
+set offsetX {{ 0 0 0 0} { 0  0  0  0} {  0  0  0  0} {  0   0   0  0} {  0   0   0  0} {100 3 3 3}  {100  3  3  3}  {100  3  3  3}}
+set offsetY {{ 0 0 0 0} {50 20 20 10} {200 80 80 40} {250 100 100 50} {300 120 120 60} {  0 0 0 0}  { 50 20 20 10}  {100 40 40 20}}
+set sW 31
 set sH 49
-set DW  0
+set DW  1
 set DH 19
-set B18W  0
+set B18W  1
 set B18H 19
-set B36W  0
+set B36W  1
 set B36H  9
 set path UserWrapper/UserModule
 for {set ii 0} {$ii < $LIST_LEN} {incr ii} \

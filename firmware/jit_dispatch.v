@@ -201,10 +201,10 @@ generate if (NUM_ACCs == 2) begin
   assign wREGn     = rcmd[23:20] ;
   assign wVALUE    = rcmd[15: 0] ;
 
-  assign wVA       = rcmd[ 3: 0] ;
-  assign wVB       = rcmd[ 7: 4] ;
-  assign wVC       = {(rcmd[11: 8] == 4'hF) ? 2'b11 : 2'b00, (wVB == 4'b0) ? 2'b01 : 2'b10, (wVA == 4'b0) ? 2'b01 : 2'b10};
-
+  assign wVA       = rcmd[23:20] ;
+  assign wVB       = rcmd[19:16] ;
+  assign wVC       = {rcmd[9: 8], rcmd[ 5: 4], rcmd[ 1: 0]};
+  //{(rcmd[11: 8] == 4'hF) ? 2'b11 : 2'b00, (wVB == 4'b0) ? 2'b01 : 2'b10, (wVA == 4'b0) ? 2'b01 : 2'b10};
   // ---------------------------------------------------------------------------
   // always @(posedge ACLK) begin
   //   if (!ARESETN) begin
@@ -596,9 +596,9 @@ generate if (NUM_ACCs == 4) begin
   assign wREGn     = rcmd[23:20] ;
   assign wVALUE    = rcmd[15: 0] ;
 
-  assign wVA       = rcmd[ 3: 0] ;
-  assign wVB       = rcmd[ 7: 4] ;
-  assign wVC       = {(rcmd[11: 8] == 4'hF) ? 2'b11 : 2'b00, (wVB == 4'b0) ? 2'b01 : 2'b10, (wVA == 4'b0) ? 2'b01 : 2'b10};
+  assign wVA       = rcmd[23:20] ;
+  assign wVB       = rcmd[19:16] ;
+  assign wVC       = {rcmd[9: 8], rcmd[ 5: 4], rcmd[ 1: 0]};
   // ---------------------------------------------------------------------------
   // always @(posedge ACLK) begin
   //   if (!ARESETN) begin
@@ -1198,9 +1198,9 @@ generate if (NUM_ACCs == 8) begin
   assign wREGn     = rcmd[23:20] ;
   assign wVALUE    = rcmd[15: 0] ;
 
-  assign wVA       = rcmd[ 3: 0] ;
-  assign wVB       = rcmd[ 7: 4] ;
-  assign wVC       = {(rcmd[11: 8] == 4'hF) ? 2'b11 : 2'b00, (wVB == 4'b0) ? 2'b01 : 2'b10, (wVA == 4'b0) ? 2'b01 : 2'b10};
+  assign wVA       = rcmd[23:20] ;
+  assign wVB       = rcmd[19:16] ;
+  assign wVC       = {rcmd[9: 8], rcmd[ 5: 4], rcmd[ 1: 0]};
   // ---------------------------------------------------------------------------
   // always @(posedge ACLK) begin
   //   if (!ARESETN) begin

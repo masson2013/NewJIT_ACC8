@@ -12,6 +12,16 @@ module jit_couple
   output  wire             mOutC_tvalid    ,
   output  wire  [31 : 0]   mOutC_tdata     ,
 
+  output  wire             sInAT_tready    ,
+  input   wire             sInAT_tvalid    ,
+  input   wire  [31 : 0]   sInAT_tdata     ,
+  output  wire             sInBT_tready    ,
+  input   wire             sInBT_tvalid    ,
+  input   wire  [31 : 0]   sInBT_tdata     ,
+  input   wire             mOutCT_tready   ,
+  output  wire             mOutCT_tvalid   ,
+  output  wire  [31 : 0]   mOutCT_tdata    ,
+
   output  wire             scInA_tready    ,
   input   wire             scInA_tvalid    ,
   input   wire  [31 : 0]   scInA_tdata     ,
@@ -44,24 +54,35 @@ module jit_couple
   // assign mcOutC_tvalid   =  (CONF[5:4] == 2'b00 ?  1'b0 : sAccInC_tvalid);
   // assign mcOutC_tdata    =  (CONF[5:4] == 2'b00 ? 32'b0 : sAccInC_tdata );
 
-  assign mOutC_tvalid    =  (CONF[5:4] == 2'b11 ?  1'b0 : sAccInC_tvalid );
-  assign mOutC_tdata     =  (CONF[5:4] == 2'b11 ? 32'b0 : sAccInC_tdata  );
+  // assign mOutC_tvalid    =  (CONF[5:4] == 2'b11 ?  1'b0 : sAccInC_tvalid );
+  // assign mOutC_tdata     =  (CONF[5:4] == 2'b11 ? 32'b0 : sAccInC_tdata  );
 
-  assign mcOutC_tvalid   =  (CONF[5:4] == 2'b11 ? sAccInC_tvalid :  1'b0 );
-  assign mcOutC_tdata    =  (CONF[5:4] == 2'b11 ? sAccInC_tdata  : 32'b0 );
+  // assign mcOutC_tvalid   =  (CONF[5:4] == 2'b11 ? sAccInC_tvalid :  1'b0 );
+  // assign mcOutC_tdata    =  (CONF[5:4] == 2'b11 ? sAccInC_tdata  : 32'b0 );
 
-  assign sAccInC_tready  =  mOutC_tready | mcOutC_tready                 ;
+  // assign sAccInC_tready  =  mOutC_tready | mcOutC_tready                 ;
 
-  jit_mux #(2) u_AccOutA_mux(
+  assign mOutC_tvalid    =  (CONF[1:0] == 2'd1 ? sAccInC_tvalid : 1'b0) ;
+  assign mOutC_tdata     =  (CONF[1:0] == 2'd1 ? sAccInC_tdata  :32'b0) ;
+
+  assign mcOutC_tvalid   =  (CONF[1:0] == 2'd2 ? sAccInC_tvalid : 1'b0) ;
+  assign mcOutC_tdata    =  (CONF[1:0] == 2'd2 ? sAccInC_tdata  :32'b0) ;
+
+  assign mOutCT_tvalid   =  (CONF[1:0] == 2'd3 ? sAccInC_tvalid : 1'b0) ;
+  assign mOutCT_tdata    =  (CONF[1:0] == 2'd3 ? sAccInC_tdata  :32'b0) ;
+
+  assign sAccInC_tready  =  mOutC_tready | mcOutC_tready | mOutCT_tready;
+
+  jit_mux #(3) u_AccOutA_mux(
     .s1_tready  (sInA_tready     ),
     .s1_tvalid  (sInA_tvalid     ),
     .s1_tdata   (sInA_tdata      ),
     .s2_tready  (scInA_tready    ),
     .s2_tvalid  (scInA_tvalid    ),
     .s2_tdata   (scInA_tdata     ),
-    .s3_tready  (sC3_tready      ),
-    .s3_tvalid  ( 1'd0           ),
-    .s3_tdata   (32'd0           ),
+    .s3_tready  (sInAT_tready    ),
+    .s3_tvalid  (sInAT_tvalid    ),
+    .s3_tdata   (sInAT_tdata     ),
     .s4_tready  (sC4_tready      ),
     .s4_tvalid  ( 1'd0           ),
     .s4_tdata   (32'd0           ),
@@ -80,21 +101,21 @@ module jit_couple
     .mO_tready  (mAccOutA_tready ),
     .mO_tvalid  (mAccOutA_tvalid ),
     .mO_tdata   (mAccOutA_tdata  ),
-    .CONF       ({2'd0,CONF[1:0]}),
+    .CONF       ({2'd0,CONF[5:4]}),
     .ACLK       (ACLK            ),
     .ARESETN    (ARESETN         )
   );
 
-  jit_mux #(2) u_AccOutB_mux(
+  jit_mux #(3) u_AccOutB_mux(
     .s1_tready  (sInB_tready     ),
     .s1_tvalid  (sInB_tvalid     ),
     .s1_tdata   (sInB_tdata      ),
     .s2_tready  (scInB_tready    ),
     .s2_tvalid  (scInB_tvalid    ),
     .s2_tdata   (scInB_tdata     ),
-    .s3_tready  (sC3_tready      ),
-    .s3_tvalid  ( 1'd0           ),
-    .s3_tdata   (32'd0           ),
+    .s3_tready  (sInBT_tready    ),
+    .s3_tvalid  (sInBT_tvalid    ),
+    .s3_tdata   (sInBT_tdata     ),
     .s4_tready  (sC4_tready      ),
     .s4_tvalid  ( 1'd0           ),
     .s4_tdata   (32'd0           ),

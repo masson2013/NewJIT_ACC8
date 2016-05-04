@@ -11,6 +11,16 @@ module jit #(
   input   wire            s13o_rdy     ,
   output  wire            s13o_valid   ,
   output  wire  [31 : 0]  s13o_data    ,
+  //----------------------------------//
+  output  wire            s14i_rdy     ,
+  input   wire            s14i_valid   ,
+  input   wire  [31 : 0]  s14i_data    ,
+  output  wire            s15i_rdy     ,
+  input   wire            s15i_valid   ,
+  input   wire  [31 : 0]  s15i_data    ,
+  input   wire            s16o_rdy     ,
+  output  wire            s16o_valid   ,
+  output  wire  [31 : 0]  s16o_data    ,
   //////////////////////////////////////
   output  wire            s21i_rdy     ,
   input   wire            s21i_valid   ,
@@ -21,6 +31,16 @@ module jit #(
   input   wire            s23o_rdy     ,
   output  wire            s23o_valid   ,
   output  wire  [31 : 0]  s23o_data    ,
+  //----------------------------------//
+  output  wire            s24i_rdy     ,
+  input   wire            s24i_valid   ,
+  input   wire  [31 : 0]  s24i_data    ,
+  output  wire            s25i_rdy     ,
+  input   wire            s25i_valid   ,
+  input   wire  [31 : 0]  s25i_data    ,
+  input   wire            s26o_rdy     ,
+  output  wire            s26o_valid   ,
+  output  wire  [31 : 0]  s26o_data    ,
   //////////////////////////////////////
   output  wire            s31i_rdy     ,
   input   wire            s31i_valid   ,
@@ -31,6 +51,16 @@ module jit #(
   input   wire            s33o_rdy     ,
   output  wire            s33o_valid   ,
   output  wire  [31 : 0]  s33o_data    ,
+  //----------------------------------//
+  output  wire            s34i_rdy     ,
+  input   wire            s34i_valid   ,
+  input   wire  [31 : 0]  s34i_data    ,
+  output  wire            s35i_rdy     ,
+  input   wire            s35i_valid   ,
+  input   wire  [31 : 0]  s35i_data    ,
+  input   wire            s36o_rdy     ,
+  output  wire            s36o_valid   ,
+  output  wire  [31 : 0]  s36o_data    ,
   //////////////////////////////////////
   output  wire            s41i_rdy     ,
   input   wire            s41i_valid   ,
@@ -41,6 +71,16 @@ module jit #(
   input   wire            s43o_rdy     ,
   output  wire            s43o_valid   ,
   output  wire  [31 : 0]  s43o_data    ,
+  //----------------------------------//
+  output  wire            s44i_rdy     ,
+  input   wire            s44i_valid   ,
+  input   wire  [31 : 0]  s44i_data    ,
+  output  wire            s45i_rdy     ,
+  input   wire            s45i_valid   ,
+  input   wire  [31 : 0]  s45i_data    ,
+  input   wire            s46o_rdy     ,
+  output  wire            s46o_valid   ,
+  output  wire  [31 : 0]  s46o_data    ,
   //////////////////////////////////////
   output  wire            s51i_rdy     ,
   input   wire            s51i_valid   ,
@@ -51,6 +91,16 @@ module jit #(
   input   wire            s53o_rdy     ,
   output  wire            s53o_valid   ,
   output  wire  [31 : 0]  s53o_data    ,
+  //----------------------------------//
+  output  wire            s54i_rdy     ,
+  input   wire            s54i_valid   ,
+  input   wire  [31 : 0]  s54i_data    ,
+  output  wire            s55i_rdy     ,
+  input   wire            s55i_valid   ,
+  input   wire  [31 : 0]  s55i_data    ,
+  input   wire            s56o_rdy     ,
+  output  wire            s56o_valid   ,
+  output  wire  [31 : 0]  s56o_data    ,
   //////////////////////////////////////
   output  wire            s61i_rdy     ,
   input   wire            s61i_valid   ,
@@ -61,6 +111,16 @@ module jit #(
   input   wire            s63o_rdy     ,
   output  wire            s63o_valid   ,
   output  wire  [31 : 0]  s63o_data    ,
+  //----------------------------------//
+  output  wire            s64i_rdy     ,
+  input   wire            s64i_valid   ,
+  input   wire  [31 : 0]  s64i_data    ,
+  output  wire            s65i_rdy     ,
+  input   wire            s65i_valid   ,
+  input   wire  [31 : 0]  s65i_data    ,
+  input   wire            s66o_rdy     ,
+  output  wire            s66o_valid   ,
+  output  wire  [31 : 0]  s66o_data    ,
   //////////////////////////////////////
   output  wire            s71i_rdy     ,
   input   wire            s71i_valid   ,
@@ -71,6 +131,16 @@ module jit #(
   input   wire            s73o_rdy     ,
   output  wire            s73o_valid   ,
   output  wire  [31 : 0]  s73o_data    ,
+  //----------------------------------//
+  output  wire            s74i_rdy     ,
+  input   wire            s74i_valid   ,
+  input   wire  [31 : 0]  s74i_data    ,
+  output  wire            s75i_rdy     ,
+  input   wire            s75i_valid   ,
+  input   wire  [31 : 0]  s75i_data    ,
+  input   wire            s76o_rdy     ,
+  output  wire            s76o_valid   ,
+  output  wire  [31 : 0]  s76o_data    ,
   //////////////////////////////////////
   output  wire            s81i_rdy     ,
   input   wire            s81i_valid   ,
@@ -81,6 +151,16 @@ module jit #(
   input   wire            s83o_rdy     ,
   output  wire            s83o_valid   ,
   output  wire  [31 : 0]  s83o_data    ,
+  //----------------------------------//
+  output  wire            s84i_rdy     ,
+  input   wire            s84i_valid   ,
+  input   wire  [31 : 0]  s84i_data    ,
+  output  wire            s85i_rdy     ,
+  input   wire            s85i_valid   ,
+  input   wire  [31 : 0]  s85i_data    ,
+  input   wire            s86o_rdy     ,
+  output  wire            s86o_valid   ,
+  output  wire  [31 : 0]  s86o_data    ,
   //////////////////////////////////////
   output  wire            s50i_rdy     ,
   input   wire            s50i_valid   ,
@@ -111,6 +191,16 @@ module jit #(
           wire            ws13o_rdy     ;
           wire            ws13o_valid   ;
           wire  [31 : 0]  ws13o_data    ;
+          //---------------------------//
+          wire            ws14i_rdy     ;
+          wire            ws14i_valid   ;
+          wire  [31 : 0]  ws14i_data    ;
+          wire            ws15i_rdy     ;
+          wire            ws15i_valid   ;
+          wire  [31 : 0]  ws15i_data    ;
+          wire            ws16o_rdy     ;
+          wire            ws16o_valid   ;
+          wire  [31 : 0]  ws16o_data    ;
           ///////////////////////////////
           wire            ws21i_rdy     ;
           wire            ws21i_valid   ;
@@ -121,6 +211,16 @@ module jit #(
           wire            ws23o_rdy     ;
           wire            ws23o_valid   ;
           wire  [31 : 0]  ws23o_data    ;
+          //---------------------------//
+          wire            ws24i_rdy     ;
+          wire            ws24i_valid   ;
+          wire  [31 : 0]  ws24i_data    ;
+          wire            ws25i_rdy     ;
+          wire            ws25i_valid   ;
+          wire  [31 : 0]  ws25i_data    ;
+          wire            ws26o_rdy     ;
+          wire            ws26o_valid   ;
+          wire  [31 : 0]  ws26o_data    ;
           ///////////////////////////////
           wire            ws31i_rdy     ;
           wire            ws31i_valid   ;
@@ -131,6 +231,16 @@ module jit #(
           wire            ws33o_rdy     ;
           wire            ws33o_valid   ;
           wire  [31 : 0]  ws33o_data    ;
+          //---------------------------//
+          wire            ws34i_rdy     ;
+          wire            ws34i_valid   ;
+          wire  [31 : 0]  ws34i_data    ;
+          wire            ws35i_rdy     ;
+          wire            ws35i_valid   ;
+          wire  [31 : 0]  ws35i_data    ;
+          wire            ws36o_rdy     ;
+          wire            ws36o_valid   ;
+          wire  [31 : 0]  ws36o_data    ;
           ///////////////////////////////
           wire            ws41i_rdy     ;
           wire            ws41i_valid   ;
@@ -141,6 +251,16 @@ module jit #(
           wire            ws43o_rdy     ;
           wire            ws43o_valid   ;
           wire  [31 : 0]  ws43o_data    ;
+          //---------------------------//
+          wire            ws44i_rdy     ;
+          wire            ws44i_valid   ;
+          wire  [31 : 0]  ws44i_data    ;
+          wire            ws45i_rdy     ;
+          wire            ws45i_valid   ;
+          wire  [31 : 0]  ws45i_data    ;
+          wire            ws46o_rdy     ;
+          wire            ws46o_valid   ;
+          wire  [31 : 0]  ws46o_data    ;
           ///////////////////////////////
           wire            ws51i_rdy     ;
           wire            ws51i_valid   ;
@@ -151,6 +271,16 @@ module jit #(
           wire            ws53o_rdy     ;
           wire            ws53o_valid   ;
           wire  [31 : 0]  ws53o_data    ;
+          //---------------------------//
+          wire            ws54i_rdy     ;
+          wire            ws54i_valid   ;
+          wire  [31 : 0]  ws54i_data    ;
+          wire            ws55i_rdy     ;
+          wire            ws55i_valid   ;
+          wire  [31 : 0]  ws55i_data    ;
+          wire            ws56o_rdy     ;
+          wire            ws56o_valid   ;
+          wire  [31 : 0]  ws56o_data    ;
           ///////////////////////////////
           wire            ws61i_rdy     ;
           wire            ws61i_valid   ;
@@ -161,6 +291,16 @@ module jit #(
           wire            ws63o_rdy     ;
           wire            ws63o_valid   ;
           wire  [31 : 0]  ws63o_data    ;
+          //---------------------------//
+          wire            ws64i_rdy     ;
+          wire            ws64i_valid   ;
+          wire  [31 : 0]  ws64i_data    ;
+          wire            ws65i_rdy     ;
+          wire            ws65i_valid   ;
+          wire  [31 : 0]  ws65i_data    ;
+          wire            ws66o_rdy     ;
+          wire            ws66o_valid   ;
+          wire  [31 : 0]  ws66o_data    ;
           ///////////////////////////////
           wire            ws71i_rdy     ;
           wire            ws71i_valid   ;
@@ -171,6 +311,16 @@ module jit #(
           wire            ws73o_rdy     ;
           wire            ws73o_valid   ;
           wire  [31 : 0]  ws73o_data    ;
+          //---------------------------//
+          wire            ws74i_rdy     ;
+          wire            ws74i_valid   ;
+          wire  [31 : 0]  ws74i_data    ;
+          wire            ws75i_rdy     ;
+          wire            ws75i_valid   ;
+          wire  [31 : 0]  ws75i_data    ;
+          wire            ws76o_rdy     ;
+          wire            ws76o_valid   ;
+          wire  [31 : 0]  ws76o_data    ;
           ///////////////////////////////
           wire            ws81i_rdy     ;
           wire            ws81i_valid   ;
@@ -181,6 +331,16 @@ module jit #(
           wire            ws83o_rdy     ;
           wire            ws83o_valid   ;
           wire  [31 : 0]  ws83o_data    ;
+          //---------------------------//
+          wire            ws84i_rdy     ;
+          wire            ws84i_valid   ;
+          wire  [31 : 0]  ws84i_data    ;
+          wire            ws85i_rdy     ;
+          wire            ws85i_valid   ;
+          wire  [31 : 0]  ws85i_data    ;
+          wire            ws86o_rdy     ;
+          wire            ws86o_valid   ;
+          wire  [31 : 0]  ws86o_data    ;
           ///////////////////////////////
           wire            ws50i_rdy     ;
           wire            ws50i_valid   ;
@@ -528,9 +688,48 @@ generate if (NUM_ACCs >= 2) begin
     .s_axis_tready  (  ws13o_rdy   ),
     .s_axis_tvalid  (  ws13o_valid ),
     .s_axis_tdata   (  ws13o_data  ),
-    .m_axis_tready  ( s13o_rdy     ),
-    .m_axis_tvalid  ( s13o_valid   ),
-    .m_axis_tdata   ( s13o_data    ),
+    .m_axis_tready  (   s13o_rdy   ),
+    .m_axis_tvalid  (   s13o_valid ),
+    .m_axis_tdata   (   s13o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s14i (
+    .s_axis_tready  (   s14i_rdy   ),
+    .s_axis_tvalid  (   s14i_valid ),
+    .s_axis_tdata   (   s14i_data  ),
+    .m_axis_tready  (  ws14i_rdy   ),
+    .m_axis_tvalid  (  ws14i_valid ),
+    .m_axis_tdata   (  ws14i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s15i (
+    .s_axis_tready  (   s15i_rdy   ),
+    .s_axis_tvalid  (   s15i_valid ),
+    .s_axis_tdata   (   s15i_data  ),
+    .m_axis_tready  (  ws15i_rdy   ),
+    .m_axis_tvalid  (  ws15i_valid ),
+    .m_axis_tdata   (  ws15i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s16o (
+    .s_axis_tready  (  ws16o_rdy   ),
+    .s_axis_tvalid  (  ws16o_valid ),
+    .s_axis_tdata   (  ws16o_data  ),
+    .m_axis_tready  (   s16o_rdy   ),
+    .m_axis_tvalid  (   s16o_valid ),
+    .m_axis_tdata   (   s16o_data  ),
     //--------------(--------------),
     .s_aclk         (clk_100       ),
     .m_aclk         (clk           ),
@@ -686,6 +885,45 @@ generate if (NUM_ACCs >= 2) begin
     .s_aresetn      (rstn          )
   );
 
+  jit_fifo       u_fifo_s24i (
+    .s_axis_tready  (   s24i_rdy   ),
+    .s_axis_tvalid  (   s24i_valid ),
+    .s_axis_tdata   (   s24i_data  ),
+    .m_axis_tready  (  ws24i_rdy   ),
+    .m_axis_tvalid  (  ws24i_valid ),
+    .m_axis_tdata   (  ws24i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s25i (
+    .s_axis_tready  (   s25i_rdy   ),
+    .s_axis_tvalid  (   s25i_valid ),
+    .s_axis_tdata   (   s25i_data  ),
+    .m_axis_tready  (  ws25i_rdy   ),
+    .m_axis_tvalid  (  ws25i_valid ),
+    .m_axis_tdata   (  ws25i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s26o (
+    .s_axis_tready  (  ws26o_rdy   ),
+    .s_axis_tvalid  (  ws26o_valid ),
+    .s_axis_tdata   (  ws26o_data  ),
+    .m_axis_tready  (   s26o_rdy   ),
+    .m_axis_tvalid  (   s26o_valid ),
+    .m_axis_tdata   (   s26o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
   jit_fifo     u_fifo_acc2A (
     .s_axis_tready  (wacc2A_tready ),
     .s_axis_tvalid  (wacc2A_tvalid ),
@@ -829,6 +1067,45 @@ generate if (NUM_ACCs >= 3) begin
     .m_axis_tready  (   s33o_rdy   ),
     .m_axis_tvalid  (   s33o_valid ),
     .m_axis_tdata   (   s33o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s34i (
+    .s_axis_tready  (   s34i_rdy   ),
+    .s_axis_tvalid  (   s34i_valid ),
+    .s_axis_tdata   (   s34i_data  ),
+    .m_axis_tready  (  ws34i_rdy   ),
+    .m_axis_tvalid  (  ws34i_valid ),
+    .m_axis_tdata   (  ws34i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s35i (
+    .s_axis_tready  (   s35i_rdy   ),
+    .s_axis_tvalid  (   s35i_valid ),
+    .s_axis_tdata   (   s35i_data  ),
+    .m_axis_tready  (  ws35i_rdy   ),
+    .m_axis_tvalid  (  ws35i_valid ),
+    .m_axis_tdata   (  ws35i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s36o (
+    .s_axis_tready  (  ws36o_rdy   ),
+    .s_axis_tvalid  (  ws36o_valid ),
+    .s_axis_tdata   (  ws36o_data  ),
+    .m_axis_tready  (   s36o_rdy   ),
+    .m_axis_tvalid  (   s36o_valid ),
+    .m_axis_tdata   (   s36o_data  ),
     //--------------(--------------),
     .s_aclk         (clk_100       ),
     .m_aclk         (clk           ),
@@ -984,6 +1261,45 @@ generate if (NUM_ACCs >= 4) begin
     .s_aresetn      (rstn          )
   );
 
+  jit_fifo       u_fifo_s44i (
+    .s_axis_tready  (   s44i_rdy   ),
+    .s_axis_tvalid  (   s44i_valid ),
+    .s_axis_tdata   (   s44i_data  ),
+    .m_axis_tready  (  ws44i_rdy   ),
+    .m_axis_tvalid  (  ws44i_valid ),
+    .m_axis_tdata   (  ws44i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s45i (
+    .s_axis_tready  (   s45i_rdy   ),
+    .s_axis_tvalid  (   s45i_valid ),
+    .s_axis_tdata   (   s45i_data  ),
+    .m_axis_tready  (  ws45i_rdy   ),
+    .m_axis_tvalid  (  ws45i_valid ),
+    .m_axis_tdata   (  ws45i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s46o (
+    .s_axis_tready  (  ws46o_rdy   ),
+    .s_axis_tvalid  (  ws46o_valid ),
+    .s_axis_tdata   (  ws46o_data  ),
+    .m_axis_tready  (   s46o_rdy   ),
+    .m_axis_tvalid  (   s46o_valid ),
+    .m_axis_tdata   (   s46o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
   jit_fifo     u_fifo_acc4A (
     .s_axis_tready  (wacc4A_tready ),
     .s_axis_tvalid  (wacc4A_tvalid ),
@@ -1127,6 +1443,45 @@ generate if (NUM_ACCs >= 5) begin
     .m_axis_tready  (   s53o_rdy   ),
     .m_axis_tvalid  (   s53o_valid ),
     .m_axis_tdata   (   s53o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s54i (
+    .s_axis_tready  (   s54i_rdy   ),
+    .s_axis_tvalid  (   s54i_valid ),
+    .s_axis_tdata   (   s54i_data  ),
+    .m_axis_tready  (  ws54i_rdy   ),
+    .m_axis_tvalid  (  ws54i_valid ),
+    .m_axis_tdata   (  ws54i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s55i (
+    .s_axis_tready  (   s55i_rdy   ),
+    .s_axis_tvalid  (   s55i_valid ),
+    .s_axis_tdata   (   s55i_data  ),
+    .m_axis_tready  (  ws55i_rdy   ),
+    .m_axis_tvalid  (  ws55i_valid ),
+    .m_axis_tdata   (  ws55i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s56o (
+    .s_axis_tready  (  ws56o_rdy   ),
+    .s_axis_tvalid  (  ws56o_valid ),
+    .s_axis_tdata   (  ws56o_data  ),
+    .m_axis_tready  (   s56o_rdy   ),
+    .m_axis_tvalid  (   s56o_valid ),
+    .m_axis_tdata   (   s56o_data  ),
     //--------------(--------------),
     .s_aclk         (clk_100       ),
     .m_aclk         (clk           ),
@@ -1282,6 +1637,45 @@ generate if (NUM_ACCs >= 6) begin
     .s_aresetn      (rstn          )
   );
 
+  jit_fifo       u_fifo_s64i (
+    .s_axis_tready  (   s64i_rdy   ),
+    .s_axis_tvalid  (   s64i_valid ),
+    .s_axis_tdata   (   s64i_data  ),
+    .m_axis_tready  (  ws64i_rdy   ),
+    .m_axis_tvalid  (  ws64i_valid ),
+    .m_axis_tdata   (  ws64i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s65i (
+    .s_axis_tready  (   s65i_rdy   ),
+    .s_axis_tvalid  (   s65i_valid ),
+    .s_axis_tdata   (   s65i_data  ),
+    .m_axis_tready  (  ws65i_rdy   ),
+    .m_axis_tvalid  (  ws65i_valid ),
+    .m_axis_tdata   (  ws65i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s66o (
+    .s_axis_tready  (  ws66o_rdy   ),
+    .s_axis_tvalid  (  ws66o_valid ),
+    .s_axis_tdata   (  ws66o_data  ),
+    .m_axis_tready  (   s66o_rdy   ),
+    .m_axis_tvalid  (   s66o_valid ),
+    .m_axis_tdata   (   s66o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
   jit_fifo     u_fifo_acc6A (
     .s_axis_tready  (wacc6A_tready ),
     .s_axis_tvalid  (wacc6A_tvalid ),
@@ -1425,6 +1819,45 @@ generate if (NUM_ACCs >= 7) begin
     .m_axis_tready  (   s73o_rdy   ),
     .m_axis_tvalid  (   s73o_valid ),
     .m_axis_tdata   (   s73o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s74i (
+    .s_axis_tready  (   s74i_rdy   ),
+    .s_axis_tvalid  (   s74i_valid ),
+    .s_axis_tdata   (   s74i_data  ),
+    .m_axis_tready  (  ws74i_rdy   ),
+    .m_axis_tvalid  (  ws74i_valid ),
+    .m_axis_tdata   (  ws74i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s75i (
+    .s_axis_tready  (   s75i_rdy   ),
+    .s_axis_tvalid  (   s75i_valid ),
+    .s_axis_tdata   (   s75i_data  ),
+    .m_axis_tready  (  ws75i_rdy   ),
+    .m_axis_tvalid  (  ws75i_valid ),
+    .m_axis_tdata   (  ws75i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s76o (
+    .s_axis_tready  (  ws76o_rdy   ),
+    .s_axis_tvalid  (  ws76o_valid ),
+    .s_axis_tdata   (  ws76o_data  ),
+    .m_axis_tready  (   s76o_rdy   ),
+    .m_axis_tvalid  (   s76o_valid ),
+    .m_axis_tdata   (   s76o_data  ),
     //--------------(--------------),
     .s_aclk         (clk_100       ),
     .m_aclk         (clk           ),
@@ -1580,6 +2013,45 @@ generate if (NUM_ACCs >= 8) begin
     .s_aresetn      (rstn          )
   );
 
+  jit_fifo       u_fifo_s84i (
+    .s_axis_tready  (   s84i_rdy   ),
+    .s_axis_tvalid  (   s84i_valid ),
+    .s_axis_tdata   (   s84i_data  ),
+    .m_axis_tready  (  ws84i_rdy   ),
+    .m_axis_tvalid  (  ws84i_valid ),
+    .m_axis_tdata   (  ws84i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s85i (
+    .s_axis_tready  (   s85i_rdy   ),
+    .s_axis_tvalid  (   s85i_valid ),
+    .s_axis_tdata   (   s85i_data  ),
+    .m_axis_tready  (  ws85i_rdy   ),
+    .m_axis_tvalid  (  ws85i_valid ),
+    .m_axis_tdata   (  ws85i_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk           ),
+    .m_aclk         (clk_100       ),
+    .s_aresetn      (rstn          )
+  );
+
+  jit_fifo       u_fifo_s86o (
+    .s_axis_tready  (  ws86o_rdy   ),
+    .s_axis_tvalid  (  ws86o_valid ),
+    .s_axis_tdata   (  ws86o_data  ),
+    .m_axis_tready  (   s86o_rdy   ),
+    .m_axis_tvalid  (   s86o_valid ),
+    .m_axis_tdata   (   s86o_data  ),
+    //--------------(--------------),
+    .s_aclk         (clk_100       ),
+    .m_aclk         (clk           ),
+    .s_aresetn      (rstn          )
+  );
+
   jit_fifo     u_fifo_acc8A (
     .s_axis_tready  (wacc8A_tready ),
     .s_axis_tvalid  (wacc8A_tvalid ),
@@ -1705,6 +2177,15 @@ endgenerate // NUM_ACCs : 8
     .m1C_tready     (ws13o_rdy     ),
     .m1C_tvalid     (ws13o_valid   ),
     .m1C_tdata      (ws13o_data    ),
+    .s1AT_tready    (ws14i_rdy     ),
+    .s1AT_tvalid    (ws14i_valid   ),
+    .s1AT_tdata     (ws14i_data    ),
+    .s1BT_tready    (ws15i_rdy     ),
+    .s1BT_tvalid    (ws15i_valid   ),
+    .s1BT_tdata     (ws15i_data    ),
+    .m1CT_tready    (ws16o_rdy     ),
+    .m1CT_tvalid    (ws16o_valid   ),
+    .m1CT_tdata     (ws16o_data    ),
     .s2A_tready     (ws21i_rdy     ),
     .s2A_tvalid     (ws21i_valid   ),
     .s2A_tdata      (ws21i_data    ),
@@ -1714,6 +2195,15 @@ endgenerate // NUM_ACCs : 8
     .m2C_tready     (ws23o_rdy     ),
     .m2C_tvalid     (ws23o_valid   ),
     .m2C_tdata      (ws23o_data    ),
+    .s2AT_tready    (ws24i_rdy     ),
+    .s2AT_tvalid    (ws24i_valid   ),
+    .s2AT_tdata     (ws24i_data    ),
+    .s2BT_tready    (ws25i_rdy     ),
+    .s2BT_tvalid    (ws25i_valid   ),
+    .s2BT_tdata     (ws25i_data    ),
+    .m2CT_tready    (ws26o_rdy     ),
+    .m2CT_tvalid    (ws26o_valid   ),
+    .m2CT_tdata     (ws26o_data    ),
     .s3A_tready     (ws31i_rdy     ),
     .s3A_tvalid     (ws31i_valid   ),
     .s3A_tdata      (ws31i_data    ),
@@ -1723,6 +2213,15 @@ endgenerate // NUM_ACCs : 8
     .m3C_tready     (ws33o_rdy     ),
     .m3C_tvalid     (ws33o_valid   ),
     .m3C_tdata      (ws33o_data    ),
+    .s3AT_tready    (ws34i_rdy     ),
+    .s3AT_tvalid    (ws34i_valid   ),
+    .s3AT_tdata     (ws34i_data    ),
+    .s3BT_tready    (ws35i_rdy     ),
+    .s3BT_tvalid    (ws35i_valid   ),
+    .s3BT_tdata     (ws35i_data    ),
+    .m3CT_tready    (ws36o_rdy     ),
+    .m3CT_tvalid    (ws36o_valid   ),
+    .m3CT_tdata     (ws36o_data    ),
     .s4A_tready     (ws41i_rdy     ),
     .s4A_tvalid     (ws41i_valid   ),
     .s4A_tdata      (ws41i_data    ),
@@ -1732,6 +2231,15 @@ endgenerate // NUM_ACCs : 8
     .m4C_tready     (ws43o_rdy     ),
     .m4C_tvalid     (ws43o_valid   ),
     .m4C_tdata      (ws43o_data    ),
+    .s4AT_tready    (ws44i_rdy     ),
+    .s4AT_tvalid    (ws44i_valid   ),
+    .s4AT_tdata     (ws44i_data    ),
+    .s4BT_tready    (ws45i_rdy     ),
+    .s4BT_tvalid    (ws45i_valid   ),
+    .s4BT_tdata     (ws45i_data    ),
+    .m4CT_tready    (ws46o_rdy     ),
+    .m4CT_tvalid    (ws46o_valid   ),
+    .m4CT_tdata     (ws46o_data    ),
     .s5A_tready     (ws51i_rdy     ),
     .s5A_tvalid     (ws51i_valid   ),
     .s5A_tdata      (ws51i_data    ),
@@ -1741,6 +2249,15 @@ endgenerate // NUM_ACCs : 8
     .m5C_tready     (ws53o_rdy     ),
     .m5C_tvalid     (ws53o_valid   ),
     .m5C_tdata      (ws53o_data    ),
+    .s5AT_tready    (ws54i_rdy     ),
+    .s5AT_tvalid    (ws54i_valid   ),
+    .s5AT_tdata     (ws54i_data    ),
+    .s5BT_tready    (ws55i_rdy     ),
+    .s5BT_tvalid    (ws55i_valid   ),
+    .s5BT_tdata     (ws55i_data    ),
+    .m5CT_tready    (ws56o_rdy     ),
+    .m5CT_tvalid    (ws56o_valid   ),
+    .m5CT_tdata     (ws56o_data    ),
     .s6A_tready     (ws61i_rdy     ),
     .s6A_tvalid     (ws61i_valid   ),
     .s6A_tdata      (ws61i_data    ),
@@ -1750,6 +2267,15 @@ endgenerate // NUM_ACCs : 8
     .m6C_tready     (ws63o_rdy     ),
     .m6C_tvalid     (ws63o_valid   ),
     .m6C_tdata      (ws63o_data    ),
+    .s6AT_tready    (ws64i_rdy     ),
+    .s6AT_tvalid    (ws64i_valid   ),
+    .s6AT_tdata     (ws64i_data    ),
+    .s6BT_tready    (ws65i_rdy     ),
+    .s6BT_tvalid    (ws65i_valid   ),
+    .s6BT_tdata     (ws65i_data    ),
+    .m6CT_tready    (ws66o_rdy     ),
+    .m6CT_tvalid    (ws66o_valid   ),
+    .m6CT_tdata     (ws66o_data    ),
     .s7A_tready     (ws71i_rdy     ),
     .s7A_tvalid     (ws71i_valid   ),
     .s7A_tdata      (ws71i_data    ),
@@ -1759,6 +2285,15 @@ endgenerate // NUM_ACCs : 8
     .m7C_tready     (ws73o_rdy     ),
     .m7C_tvalid     (ws73o_valid   ),
     .m7C_tdata      (ws73o_data    ),
+    .s7AT_tready    (ws74i_rdy     ),
+    .s7AT_tvalid    (ws74i_valid   ),
+    .s7AT_tdata     (ws74i_data    ),
+    .s7BT_tready    (ws75i_rdy     ),
+    .s7BT_tvalid    (ws75i_valid   ),
+    .s7BT_tdata     (ws75i_data    ),
+    .m7CT_tready    (ws76o_rdy     ),
+    .m7CT_tvalid    (ws76o_valid   ),
+    .m7CT_tdata     (ws76o_data    ),
     .s8A_tready     (ws81i_rdy     ),
     .s8A_tvalid     (ws81i_valid   ),
     .s8A_tdata      (ws81i_data    ),
@@ -1768,6 +2303,15 @@ endgenerate // NUM_ACCs : 8
     .m8C_tready     (ws83o_rdy     ),
     .m8C_tvalid     (ws83o_valid   ),
     .m8C_tdata      (ws83o_data    ),
+    .s8AT_tready    (ws84i_rdy     ),
+    .s8AT_tvalid    (ws84i_valid   ),
+    .s8AT_tdata     (ws84i_data    ),
+    .s8BT_tready    (ws85i_rdy     ),
+    .s8BT_tvalid    (ws85i_valid   ),
+    .s8BT_tdata     (ws85i_data    ),
+    .m8CT_tready    (ws86o_rdy     ),
+    .m8CT_tvalid    (ws86o_valid   ),
+    .m8CT_tdata     (ws86o_data    ),
     .s1C_tready     (wacc1C_tready ),
     .s1C_tvalid     (wacc1C_tvalid ),
     .s1C_tdata      (wacc1C_tdata  ),

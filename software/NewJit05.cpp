@@ -12,9 +12,10 @@
 #include <locale.h>
 
 using namespace std;
-
-//#define VERBOSE
-//#define VERBOSE_THREAD
+#define SORT128
+// #define SORT256
+// #define VERBOSE
+// #define VERBOSE_THREAD
 // #define P_TEST
 #include "jit_isa.h"
 // 1024 * 10 * 1024
@@ -105,6 +106,63 @@ typedef struct {
   int     SizePR6_In2;
   int        *PR6_Out;
   int     SizePR6_Out;
+
+  int        *PR7_In1;
+  int     SizePR7_In1;
+  int        *PR7_In2;
+  int     SizePR7_In2;
+  int        *PR7_Out;
+  int     SizePR7_Out;
+
+  int        *PR8_In1;
+  int     SizePR8_In1;
+  int        *PR8_In2;
+  int     SizePR8_In2;
+  int        *PR8_Out;
+  int     SizePR8_Out;
+
+  int        *PR9_In1;
+  int     SizePR9_In1;
+  int        *PR9_In2;
+  int     SizePR9_In2;
+  int        *PR9_Out;
+  int     SizePR9_Out;
+
+  int        *PR10_In1;
+  int     SizePR10_In1;
+  int        *PR10_In2;
+  int     SizePR10_In2;
+  int        *PR10_Out;
+  int     SizePR10_Out;
+
+  int        *PR11_In1;
+  int     SizePR11_In1;
+  int        *PR11_In2;
+  int     SizePR11_In2;
+  int        *PR11_Out;
+  int     SizePR11_Out;
+
+  int        *PR12_In1;
+  int     SizePR12_In1;
+  int        *PR12_In2;
+  int     SizePR12_In2;
+  int        *PR12_Out;
+  int     SizePR12_Out;
+
+  int        *PR13_In1;
+  int     SizePR13_In1;
+  int        *PR13_In2;
+  int     SizePR13_In2;
+  int        *PR13_Out;
+  int     SizePR13_Out;
+
+  int        *PR14_In1;
+  int     SizePR14_In1;
+  int        *PR14_In2;
+  int     SizePR14_In2;
+  int        *PR14_Out;
+  int     SizePR14_Out;
+
 }task_pk_t;
 
 void * threads_call(void* ptr)
@@ -123,6 +181,10 @@ void * VMUL_Threads_Call(void *pk)
 #ifdef VERBOSE_THREAD
   printf("\r\n");
 #endif
+
+  struct timeval start, end;
+  int timeuse;
+
   task_pk_t *p      = (task_pk_t*) pk;
 #ifdef VERBOSE_THREAD
   printf("[DEBUG->task_thread:%2d] task thread start\r\n", p->task_id);
@@ -136,6 +198,71 @@ void * VMUL_Threads_Call(void *pk)
   int         items    = p->len;
   int         err;
 
+  #ifdef SORT256
+  gettimeofday(&start, NULL);
+  err =   vnew(VM, nPR);                                                                                                errCheck(err, FUN_VNEW);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VNEW: %'9d us\r\n", 1, timeuse);
+
+  gettimeofday(&start, NULL);
+  err =   vlpr(VM, nPR->at(0),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(1),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(2),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(3),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(4),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(5),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(6),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+
+  err =   vlpr(VM, nPR->at(7),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(8),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(9),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(10), INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(11), MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(12), MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(13), MERGE);                                                                                 errCheck(err, FUN_VLPR);
+
+  err =   vlpr(VM, nPR->at(14), MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VLPR: %'9d us\r\n", 1, timeuse);
+
+  gettimeofday(&start, NULL);
+  err = vtieio(VM, nPR->at(0),  p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, nPR->at(4), p->SizePR0_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(1),  p->PR1_In1, p->SizePR1_In1, p->PR1_In2, p->SizePR1_In2, nPR->at(4), p->SizePR1_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(2),  p->PR2_In1, p->SizePR2_In1, p->PR2_In2, p->SizePR2_In2, nPR->at(5), p->SizePR2_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(3),  p->PR3_In1, p->SizePR3_In1, p->PR3_In2, p->SizePR3_In2, nPR->at(5), p->SizePR3_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(4),  nPR->at(0), p->SizePR4_In1, nPR->at(1), p->SizePR4_In2, nPR->at(6), p->SizePR4_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(5),  nPR->at(2), p->SizePR5_In1, nPR->at(3), p->SizePR5_In2, nPR->at(6), p->SizePR5_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(6),  nPR->at(4), p->SizePR6_In1, nPR->at(5), p->SizePR6_In2, nPR->at(14),p->SizePR6_Out);    errCheck(err, FUN_VTIEIO);
+
+  err = vtieio(VM, nPR->at(7),  p->PR7_In1, p->SizePR7_In1, p->PR7_In2, p->SizePR7_In2, nPR->at(11), p->SizePR7_Out);   errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(8),  p->PR8_In1, p->SizePR8_In1, p->PR8_In2, p->SizePR8_In2, nPR->at(11), p->SizePR8_Out);   errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(9),  p->PR9_In1, p->SizePR9_In1, p->PR9_In2, p->SizePR9_In2, nPR->at(12), p->SizePR9_Out);   errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(10), p->PR10_In1,p->SizePR10_In1,p->PR10_In2,p->SizePR10_In2,nPR->at(12), p->SizePR10_Out);  errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(11), nPR->at(7), p->SizePR11_In1,nPR->at(8), p->SizePR11_In2,nPR->at(13), p->SizePR11_Out);  errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(12), nPR->at(9), p->SizePR12_In1,nPR->at(10),p->SizePR12_In2,nPR->at(13), p->SizePR12_Out);  errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(13), nPR->at(11),p->SizePR13_In1,nPR->at(12),p->SizePR13_In2,nPR->at(14), p->SizePR13_Out);  errCheck(err, FUN_VTIEIO);
+
+  err = vtieio(VM, nPR->at(14), nPR->at(6), p->SizePR14_In1,nPR->at(13),p->SizePR14_In2,p->PR14_Out, p->SizePR14_Out);  errCheck(err, FUN_VTIEIO);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VTIEIO: %'9d us\r\n", 1, timeuse);
+
+  gettimeofday(&start, NULL);
+  err = vstart(VM, nPR);                                                                                                errCheck(err, FUN_VSTART);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VSTRAT: %'9d us\r\n", 1, timeuse);
+
+  gettimeofday(&start, NULL);
+  err =   vdel(VM, nPR);                                                                                                errCheck(err, FUN_VDEL);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VDEL: %'9d us\r\n", 1, timeuse);
+
+  #endif
+
   // // Sort
   // err =   vnew(VM, nPR);                                                                            errCheck(err, FUN_VNEW);
   // err =   vlpr(VM, nPR->at(0),  INSERTION);                                                         errCheck(err, FUN_VLPR);
@@ -147,27 +274,74 @@ void * VMUL_Threads_Call(void *pk)
   // err = vstart(VM, nPR,         p->SizePR0_In1, p->SizePR1_In1, p->SizePR2_Out);                    errCheck(err, FUN_VSTART);
   // err =   vdel(VM, nPR);                                                                            errCheck(err, FUN_VDEL);
 
-  // Sort
-  err =   vnew(VM, nPR);                                                                            errCheck(err, FUN_VNEW);
-  err =   vlpr(VM, nPR->at(0),  INSERTION);                                                         errCheck(err, FUN_VLPR);
-  err =   vlpr(VM, nPR->at(1),  INSERTION);                                                         errCheck(err, FUN_VLPR);
-  err =   vlpr(VM, nPR->at(2),  INSERTION);                                                         errCheck(err, FUN_VLPR);
-  err =   vlpr(VM, nPR->at(3),  INSERTION);                                                         errCheck(err, FUN_VLPR);
-  err =   vlpr(VM, nPR->at(4),  MERGE);                                                             errCheck(err, FUN_VLPR);
-  err =   vlpr(VM, nPR->at(5),  MERGE);                                                             errCheck(err, FUN_VLPR);
-  err =   vlpr(VM, nPR->at(6),  MERGE);                                                             errCheck(err, FUN_VLPR);
+  #ifdef SORT128
 
-  err = vtieio(VM, nPR->at(0),  p->PR0_In1,     p->PR0_In2,     nPR->at(4),     p->SizePR0_In1);    errCheck(err, FUN_VTIEIO);
-  err = vtieio(VM, nPR->at(1),  p->PR1_In1,     p->PR1_In2,     nPR->at(4),     p->SizePR1_In1);    errCheck(err, FUN_VTIEIO);
-  err = vtieio(VM, nPR->at(2),  p->PR2_In1,     p->PR2_In2,     nPR->at(5),     p->SizePR2_In1);    errCheck(err, FUN_VTIEIO);
-  err = vtieio(VM, nPR->at(3),  p->PR3_In1,     p->PR3_In2,     nPR->at(5),     p->SizePR3_In1);    errCheck(err, FUN_VTIEIO);
+  gettimeofday(&start, NULL);
+  err =   vnew(VM, nPR);                                                                                                errCheck(err, FUN_VNEW);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VNEW: %'9d us\r\n", 1, timeuse);
 
-  err = vtieio(VM, nPR->at(4),  nPR->at(0),     nPR->at(1),     nPR->at(6),     p->SizePR4_In1);    errCheck(err, FUN_VTIEIO);
-  err = vtieio(VM, nPR->at(5),  nPR->at(2),     nPR->at(3),     nPR->at(6),     p->SizePR5_In1);    errCheck(err, FUN_VTIEIO);
-  err = vtieio(VM, nPR->at(6),  nPR->at(4),     nPR->at(5),     p->PR6_Out,     p->SizePR6_In1);    errCheck(err, FUN_VTIEIO);
+  gettimeofday(&start, NULL);
+  err =   vlpr(VM, nPR->at(0),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(1),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(2),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(3),  INSERTION);                                                                             errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(4),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(5),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  err =   vlpr(VM, nPR->at(6),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VLPR: %'9d us\r\n", 1, timeuse);
 
-  err = vstart(VM, nPR,         p->SizePR0_In1, p->SizePR1_In1, p->SizePR6_Out);                    errCheck(err, FUN_VSTART);
-  err =   vdel(VM, nPR);                                                                            errCheck(err, FUN_VDEL);
+  gettimeofday(&start, NULL);
+  err = vtieio(VM, nPR->at(0),  p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, nPR->at(4), p->SizePR0_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(1),  p->PR1_In1, p->SizePR1_In1, p->PR1_In2, p->SizePR1_In2, nPR->at(4), p->SizePR1_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(2),  p->PR2_In1, p->SizePR2_In1, p->PR2_In2, p->SizePR2_In2, nPR->at(5), p->SizePR2_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(3),  p->PR3_In1, p->SizePR3_In1, p->PR3_In2, p->SizePR3_In2, nPR->at(5), p->SizePR3_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(4),  nPR->at(0), p->SizePR4_In1, nPR->at(1), p->SizePR4_In2, nPR->at(6), p->SizePR4_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(5),  nPR->at(2), p->SizePR5_In1, nPR->at(3), p->SizePR5_In2, nPR->at(6), p->SizePR5_Out);    errCheck(err, FUN_VTIEIO);
+  err = vtieio(VM, nPR->at(6),  nPR->at(4), p->SizePR6_In1, nPR->at(5), p->SizePR6_In2, p->PR6_Out, p->SizePR6_Out);    errCheck(err, FUN_VTIEIO);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VTIEIO: %'9d us\r\n", 1, timeuse);
+
+  gettimeofday(&start, NULL);
+  err = vstart(VM, nPR);                                                                                                errCheck(err, FUN_VSTART);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VSTRAT: %'9d us\r\n", 1, timeuse);
+
+  gettimeofday(&start, NULL);
+  err =   vdel(VM, nPR);                                                                                                errCheck(err, FUN_VDEL);
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("[DEBUG->task_thread:%2d] VDEL: %'9d us\r\n", 1, timeuse);
+  #endif
+
+
+
+  // // Sort
+  // err =   vnew(VM, nPR);                                                                            errCheck(err, FUN_VNEW);
+  // err =   vlpr(VM, nPR->at(0),  INSERTION);                                                         errCheck(err, FUN_VLPR);
+  // err =   vlpr(VM, nPR->at(1),  INSERTION);                                                         errCheck(err, FUN_VLPR);
+  // err =   vlpr(VM, nPR->at(2),  INSERTION);                                                         errCheck(err, FUN_VLPR);
+  // err =   vlpr(VM, nPR->at(3),  INSERTION);                                                         errCheck(err, FUN_VLPR);
+  // err =   vlpr(VM, nPR->at(4),  MERGE);                                                             errCheck(err, FUN_VLPR);
+  // err =   vlpr(VM, nPR->at(5),  MERGE);                                                             errCheck(err, FUN_VLPR);
+  // err =   vlpr(VM, nPR->at(6),  MERGE);                                                             errCheck(err, FUN_VLPR);
+
+  // err = vtieio(VM, nPR->at(0),  p->PR0_In1,     p->PR0_In2,     nPR->at(4),     p->SizePR0_In1);    errCheck(err, FUN_VTIEIO);
+  // err = vtieio(VM, nPR->at(1),  p->PR1_In1,     p->PR1_In2,     nPR->at(4),     p->SizePR1_In1);    errCheck(err, FUN_VTIEIO);
+  // err = vtieio(VM, nPR->at(2),  p->PR2_In1,     p->PR2_In2,     nPR->at(5),     p->SizePR2_In1);    errCheck(err, FUN_VTIEIO);
+  // err = vtieio(VM, nPR->at(3),  p->PR3_In1,     p->PR3_In2,     nPR->at(5),     p->SizePR3_In1);    errCheck(err, FUN_VTIEIO);
+
+  // err = vtieio(VM, nPR->at(4),  nPR->at(0),     nPR->at(1),     nPR->at(6),     p->SizePR4_In1);    errCheck(err, FUN_VTIEIO);
+  // err = vtieio(VM, nPR->at(5),  nPR->at(2),     nPR->at(3),     nPR->at(6),     p->SizePR5_In1);    errCheck(err, FUN_VTIEIO);
+  // err = vtieio(VM, nPR->at(6),  nPR->at(4),     nPR->at(5),     p->PR6_Out,     p->SizePR6_In1);    errCheck(err, FUN_VTIEIO);
+
+  // err = vstart(VM, nPR,         p->SizePR0_In1, p->SizePR1_In1, p->SizePR6_Out);                    errCheck(err, FUN_VSTART);
+  // err =   vdel(VM, nPR);                                                                            errCheck(err, FUN_VDEL);
 
   // // Add
   // err =   vnew(VM, nPR);                                                                            errCheck(err, FUN_VNEW);
@@ -343,36 +517,56 @@ int main(int argc, char* argv[])
   struct timeval start, end;
   int timeuse;
 
-  int *A = new int[SWSIZE * 2 * 2 * 2];
-  int *B = new int[SWSIZE * 2 * 2 * 2];
-  int *C = new int[SWSIZE * 2 * 2 * 2];
-  int *D = new int[SWSIZE * 2 * 2 * 2];
-  int *E = new int[SWSIZE * 2 * 2 * 2];
-  int *F = new int[SWSIZE * 2 * 2 * 2];
+  int *A = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *B = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *C = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *D = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *E = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *F = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *G = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *H = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *I = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *J = new int[SWSIZE * 2 * 2 * 2 * 2];
+  int *K = new int[SWSIZE * 2 * 2 * 2 * 2];
 
   int i;
   int j;
   int sum;
 
-  for (i = 0; i < SWSIZE * 4; i++) {
+  for (i = 0; i < SWSIZE * 2 * 2 * 2 * 2; i++) {
     A[i] = -2;
     B[i] = -2;
     C[i] = -2;
     D[i] = -2;
     E[i] = -2;
     F[i] = -2;
+    G[i] = -2;
+    H[i] = -2;
+    I[i] = -2;
+    J[i] = -2;
+    K[i] = -2;
   }
 
   for (i = 0; i < SWSIZE; i++) {
-    A[i] = 200 - 0 - i * 4;
-    B[i] = 200 - 1 - i * 4;
-    C[i] = 200 - 2 - i * 4;
-    D[i] = 200 - 3 - i * 4;
-    F[SWSIZE * 0 + i] = A[i];
-    F[SWSIZE * 1 + i] = B[i];
-    F[SWSIZE * 2 + i] = C[i];
-    F[SWSIZE * 3 + i] = D[i];
+    A[i] = 500 - 0 - i * 8;
+    B[i] = 500 - 1 - i * 8;
+    C[i] = 500 - 2 - i * 8;
+    D[i] = 500 - 3 - i * 8;
+    E[i] = 500 - 4 - i * 8;
+    F[i] = 500 - 5 - i * 8;
+    G[i] = 500 - 6 - i * 8;
+    H[i] = 500 - 7 - i * 8;
+
+    K[SWSIZE * 0 + i] = A[i];
+    K[SWSIZE * 1 + i] = B[i];
+    K[SWSIZE * 2 + i] = C[i];
+    K[SWSIZE * 3 + i] = D[i];
+    K[SWSIZE * 4 + i] = E[i];
+    K[SWSIZE * 5 + i] = F[i];
+    K[SWSIZE * 6 + i] = G[i];
+    K[SWSIZE * 7 + i] = H[i];
   }
+
   for (i = 0; i < SWSIZE; i++) {
     A[SWSIZE + i] = 0xDEADBEEF;
   }
@@ -385,40 +579,22 @@ int main(int argc, char* argv[])
   for (i = 0; i < SWSIZE; i++) {
     D[SWSIZE + i] = 0xDEADBEEF;
   }
-  // for (i = 0; i < SWSIZE * 4; i++) {
-  //   C[i] = -2;
-  //   D[i] = -2;
-  //   E[i] = -2;
-  // }
-
-  // for (i = 0; i < SWSIZE * 2; i++) {
-  //   A[i] = i * 2;
-  // }
-
-  // for (i = 0; i < SWSIZE * 2; i++) {
-  //   B[i] = i * 2 + 1;
-  // }
-
-  // for (i = 0; i < SWSIZE; i++) {
-  //   A[i] = 70 - i * 2;
-  // }
-  // for (i = 0; i < SWSIZE; i++) {
-  //   A[SWSIZE + i] = 0xDEADBEEF;
-  // }
-
-  // for (i = 0; i < SWSIZE; i++) {
-  //   B[i] = 69 - i * 2;
-  // }
-  // for (i = 0; i < SWSIZE; i++) {
-  //   B[SWSIZE + i] = 0xDEADBEEF;
-  // }
+  for (i = 0; i < SWSIZE; i++) {
+    E[SWSIZE + i] = 0xDEADBEEF;
+  }
+  for (i = 0; i < SWSIZE; i++) {
+    F[SWSIZE + i] = 0xDEADBEEF;
+  }
+  for (i = 0; i < SWSIZE; i++) {
+    G[SWSIZE + i] = 0xDEADBEEF;
+  }
+  for (i = 0; i < SWSIZE; i++) {
+    H[SWSIZE + i] = 0xDEADBEEF;
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   gettimeofday(&start, NULL);
-  InsertionSort(F, SWSIZE * 4);
-  // for (i = 0; i < SWSIZE; i++) {
-  //   C[i] = A[i] + B[i];
-  // }
+  InsertionSort(K, SWSIZE * 8);
   gettimeofday(&end, NULL);
   timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
   printf("CPU %'4d threads :\t%'9d us\r\n", 1, timeuse);
@@ -429,12 +605,36 @@ int main(int argc, char* argv[])
   VM.BITSTREAM_TABLE = NULL;
   VAM_VM_INIT(&VM, argc, argv);
   // VAM_TABLE_SHOW(VM);
+  printf("[DEBUG->VAM_VM_INIT] VM_INIT Done\r\n");
+  //////////////////////////////////////////////////////////////////////////////
+  // VM.VAM_TABLE->at(0).status  = 1;
+  // VM.VAM_TABLE->at(1).status  = 1;
+  // VM.VAM_TABLE->at(2).status  = 1;
+  // VM.VAM_TABLE->at(3).status  = 1;
+  // VM.VAM_TABLE->at(4).status  = 1;
+  // VM.VAM_TABLE->at(5).status  = 1;
+  // VM.VAM_TABLE->at(6).status  = 1;
+  VM.VAM_TABLE->at(7).status  = 1;
 
-
+  // VM.VAM_TABLE->at(8).status  = 0;
+  // VM.VAM_TABLE->at(9).status  = 0;
+  // VM.VAM_TABLE->at(10).status = 0;
+  // VM.VAM_TABLE->at(11).status = 0;
+  // VM.VAM_TABLE->at(12).status = 0;
+  // VM.VAM_TABLE->at(13).status = 0;
+  // VM.VAM_TABLE->at(14).status = 0;
+  // VM.VAM_TABLE->at(15).status = 0;
+  //////////////////////////////////////////////////////////////////////////////
 
   {
     int THREADS = 1;
+    #ifdef SORT128
     int STEPS   = 7;
+    #endif
+
+    #ifdef SORT256
+    int STEPS   = 15;
+    #endif
     pthread_t thread[THREADS];
     task_pk_t task_pkg[THREADS];
 
@@ -448,70 +648,114 @@ int main(int argc, char* argv[])
       task_pkg[i].VM      = &VM;
       task_pkg[i].nPR     = &nPR[i];
       task_pkg[i].len     = SIZE / THREADS;
+#ifdef SORT256
+      task_pkg[i].PR0_In1      = A;
+      task_pkg[i].SizePR0_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR0_In2      = NULL;
+      task_pkg[i].SizePR0_In2  = 0;
+      task_pkg[i].PR0_Out      = NULL;
+      task_pkg[i].SizePR0_Out  = task_pkg[i].len * 2;
 
-      // task_pkg[i].PR0_In1      = A;
-      // task_pkg[i].SizePR0_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
-      // task_pkg[i].PR0_In2      = NULL;
-      // task_pkg[i].SizePR0_In2  = 0;
-      // task_pkg[i].PR0_Out      = C;
-      // task_pkg[i].SizePR0_Out  = task_pkg[i].len * 2;
+      task_pkg[i].PR1_In1      = B;
+      task_pkg[i].SizePR1_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR1_In2      = NULL;
+      task_pkg[i].SizePR1_In2  = 0;
+      task_pkg[i].PR1_Out      = NULL;
+      task_pkg[i].SizePR1_Out  = task_pkg[i].len * 2;
 
-      // task_pkg[i].PR1_In1      = B;
-      // task_pkg[i].SizePR1_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
-      // task_pkg[i].PR1_In2      = NULL;
-      // task_pkg[i].SizePR1_In2  = 0;
-      // task_pkg[i].PR1_Out      = D;
-      // task_pkg[i].SizePR1_Out  = task_pkg[i].len * 2;
+      task_pkg[i].PR2_In1      = C;
+      task_pkg[i].SizePR2_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR2_In2      = NULL;
+      task_pkg[i].SizePR2_In2  = 0;
+      task_pkg[i].PR2_Out      = NULL;
+      task_pkg[i].SizePR2_Out  = task_pkg[i].len * 2;
 
-      // task_pkg[i].PR2_In1      = C;
-      // task_pkg[i].SizePR2_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
-      // task_pkg[i].PR2_In2      = D;
-      // task_pkg[i].SizePR2_In2  = task_pkg[i].len * 2; // 32 items, 64 numbers
-      // task_pkg[i].PR2_Out      = E;
-      // task_pkg[i].SizePR2_Out  = task_pkg[i].len * 4;
-///////////////////////////
-      // task_pkg[i].PR0_In1      = A;
-      // task_pkg[i].SizePR0_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
-      // task_pkg[i].PR0_In2      = NULL;
-      // task_pkg[i].SizePR0_In2  = 0;
-      // task_pkg[i].PR0_Out      = NULL;
-      // task_pkg[i].SizePR0_Out  = task_pkg[i].len * 2;
+      task_pkg[i].PR3_In1      = D;
+      task_pkg[i].SizePR3_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR3_In2      = NULL;
+      task_pkg[i].SizePR3_In2  = 0;
+      task_pkg[i].PR3_Out      = NULL;
+      task_pkg[i].SizePR3_Out  = task_pkg[i].len * 2;
 
-      // task_pkg[i].PR1_In1      = B;
-      // task_pkg[i].SizePR1_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
-      // task_pkg[i].PR1_In2      = NULL;
-      // task_pkg[i].SizePR1_In2  = 0;
-      // task_pkg[i].PR1_Out      = NULL;
-      // task_pkg[i].SizePR1_Out  = task_pkg[i].len * 2;
+      task_pkg[i].PR4_In1      = NULL;
+      task_pkg[i].SizePR4_In1  = task_pkg[i].len * 2;
+      task_pkg[i].PR4_In2      = NULL;
+      task_pkg[i].SizePR4_In2  = task_pkg[i].len * 2;
+      task_pkg[i].PR4_Out      = NULL;
+      task_pkg[i].SizePR4_Out  = task_pkg[i].len * 2 * 2;
 
-      // task_pkg[i].PR2_In1      = NULL;
-      // task_pkg[i].SizePR2_In1  = task_pkg[i].len * 2;
-      // task_pkg[i].PR2_In2      = NULL;
-      // task_pkg[i].SizePR2_In2  = task_pkg[i].len * 2;
-      // task_pkg[i].PR2_Out      = E;
-      // task_pkg[i].SizePR2_Out  = task_pkg[i].len * 4;
-////////////////////////
-      // task_pkg[i].PR0_In1      = A;
-      // task_pkg[i].SizePR0_In1  = task_pkg[i].len;
-      // task_pkg[i].PR0_In2      = A;
-      // task_pkg[i].SizePR0_In2  = task_pkg[i].len;
-      // task_pkg[i].PR0_Out      = NULL;
-      // task_pkg[i].SizePR0_Out  = task_pkg[i].len;
+      task_pkg[i].PR5_In1      = NULL;
+      task_pkg[i].SizePR5_In1  = task_pkg[i].len * 2;
+      task_pkg[i].PR5_In2      = NULL;
+      task_pkg[i].SizePR5_In2  = task_pkg[i].len * 2;
+      task_pkg[i].PR5_Out      = NULL;
+      task_pkg[i].SizePR5_Out  = task_pkg[i].len * 2 * 2;
 
-      // task_pkg[i].PR1_In1      = B;
-      // task_pkg[i].SizePR1_In1  = task_pkg[i].len;
-      // task_pkg[i].PR1_In2      = B;
-      // task_pkg[i].SizePR1_In2  = task_pkg[i].len;
-      // task_pkg[i].PR1_Out      = NULL;
-      // task_pkg[i].SizePR1_Out  = task_pkg[i].len;
+      task_pkg[i].PR6_In1      = NULL;
+      task_pkg[i].SizePR6_In1  = task_pkg[i].len * 2;
+      task_pkg[i].PR6_In2      = NULL;
+      task_pkg[i].SizePR6_In2  = task_pkg[i].len * 2;
+      task_pkg[i].PR6_Out      = NULL;
+      task_pkg[i].SizePR6_Out  = task_pkg[i].len * 2 * 2 * 2;
+      ///////////////////////////////////////////////////////
+      task_pkg[i].PR7_In1      = E;
+      task_pkg[i].SizePR7_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR7_In2      = NULL;
+      task_pkg[i].SizePR7_In2  = 0;
+      task_pkg[i].PR7_Out      = NULL;
+      task_pkg[i].SizePR7_Out  = task_pkg[i].len * 2;
 
-      // task_pkg[i].PR2_In1      = NULL;
-      // task_pkg[i].SizePR2_In1  = task_pkg[i].len;
-      // task_pkg[i].PR2_In2      = NULL;
-      // task_pkg[i].SizePR2_In2  = task_pkg[i].len;
-      // task_pkg[i].PR2_Out      = E;
-      // task_pkg[i].SizePR2_Out  = task_pkg[i].len;
+      task_pkg[i].PR8_In1      = F;
+      task_pkg[i].SizePR8_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR8_In2      = NULL;
+      task_pkg[i].SizePR8_In2  = 0;
+      task_pkg[i].PR8_Out      = NULL;
+      task_pkg[i].SizePR8_Out  = task_pkg[i].len * 2;
 
+      task_pkg[i].PR9_In1      = G;
+      task_pkg[i].SizePR9_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR9_In2      = NULL;
+      task_pkg[i].SizePR9_In2  = 0;
+      task_pkg[i].PR9_Out      = NULL;
+      task_pkg[i].SizePR9_Out  = task_pkg[i].len * 2;
+
+      task_pkg[i].PR10_In1      = H;
+      task_pkg[i].SizePR10_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      task_pkg[i].PR10_In2      = NULL;
+      task_pkg[i].SizePR10_In2  = 0;
+      task_pkg[i].PR10_Out      = NULL;
+      task_pkg[i].SizePR10_Out  = task_pkg[i].len * 2;
+
+      task_pkg[i].PR11_In1      = NULL;
+      task_pkg[i].SizePR11_In1  = task_pkg[i].len * 2;
+      task_pkg[i].PR11_In2      = NULL;
+      task_pkg[i].SizePR11_In2  = task_pkg[i].len * 2;
+      task_pkg[i].PR11_Out      = NULL;
+      task_pkg[i].SizePR11_Out  = task_pkg[i].len * 2 * 2;
+
+      task_pkg[i].PR12_In1      = NULL;
+      task_pkg[i].SizePR12_In1  = task_pkg[i].len * 2;
+      task_pkg[i].PR12_In2      = NULL;
+      task_pkg[i].SizePR12_In2  = task_pkg[i].len * 2;
+      task_pkg[i].PR12_Out      = NULL;
+      task_pkg[i].SizePR12_Out  = task_pkg[i].len * 2 * 2;
+
+      task_pkg[i].PR13_In1      = NULL;
+      task_pkg[i].SizePR13_In1  = task_pkg[i].len * 2;
+      task_pkg[i].PR13_In2      = NULL;
+      task_pkg[i].SizePR13_In2  = task_pkg[i].len * 2;
+      task_pkg[i].PR13_Out      = NULL;
+      task_pkg[i].SizePR13_Out  = task_pkg[i].len * 2 * 2 * 2;
+      //////////////////////////////////////////////////////////////////////////
+      task_pkg[i].PR14_In1      = NULL;
+      task_pkg[i].SizePR14_In1  = task_pkg[i].len * 2 * 2 * 2;
+      task_pkg[i].PR14_In2      = NULL;
+      task_pkg[i].SizePR14_In2  = task_pkg[i].len * 2 * 2 * 2;
+      task_pkg[i].PR14_Out      = J;
+      task_pkg[i].SizePR14_Out  = task_pkg[i].len * 2 * 2 * 2 * 2;
+#endif
+
+#ifdef SORT128
       task_pkg[i].PR0_In1      = A;
       task_pkg[i].SizePR0_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
       task_pkg[i].PR0_In2      = NULL;
@@ -560,7 +804,7 @@ int main(int argc, char* argv[])
       task_pkg[i].SizePR6_In2  = task_pkg[i].len * 2;
       task_pkg[i].PR6_Out      = E;
       task_pkg[i].SizePR6_Out  = task_pkg[i].len * 2 * 2 * 2;
-
+#endif
     }
 
     gettimeofday(&start, NULL);
@@ -575,8 +819,8 @@ int main(int argc, char* argv[])
     printf("JIT %'4d threads :\t%'9d us\t", THREADS, timeuse);
 
     printf("\r\n");
-    for (i = 0; i < SWSIZE * 2 * 2 * 2; i++) {
-      printf("%3d:\tA:%10d\tB:%10d\tC:%10d\tD:%10d\tE:%10d\tF:%10d\r\n", i, A[i], B[i], C[i], D[i], E[i], F[i]);
+    for (i = 0; i < SWSIZE * 2 * 2 * 2 * 2; i++) {
+      printf("%4d:\tA:%4d B:%4d C:%4d D:%4d E:%4d F:%4d G:%4d H:%4d I:%4d J:%4d K:%4d\n", i, A[i], B[i], C[i], D[i], E[i], F[i], G[i], H[i], I[i], J[i], K[i]);
       // if (C[i] != D[i]) {
       //   printf("Error at %d:\tA:%d\tB:%d\tC:%d\tD:%d\r\nFailed!\r\n", i, A[i], B[i], C[i], D[i]);
       //   VAM_VM_CLEAN(&VM);
@@ -599,6 +843,70 @@ int main(int argc, char* argv[])
   delete[] F;
   return 0;
 }
+
+//       task_pkg[i].PR0_In1      = A;
+//       task_pkg[i].SizePR0_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+//       task_pkg[i].PR0_In2      = NULL;
+//       task_pkg[i].SizePR0_In2  = 0;
+//       task_pkg[i].PR0_Out      = NULL;
+//       task_pkg[i].SizePR0_Out  = task_pkg[i].len * 2;
+
+//       task_pkg[i].PR1_In1      = B;
+//       task_pkg[i].SizePR1_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+//       task_pkg[i].PR1_In2      = NULL;
+//       task_pkg[i].SizePR1_In2  = 0;
+//       task_pkg[i].PR1_Out      = NULL;
+//       task_pkg[i].SizePR1_Out  = task_pkg[i].len * 2;
+
+//       task_pkg[i].PR2_In1      = NULL;
+//       task_pkg[i].SizePR2_In1  = task_pkg[i].len * 2;
+//       task_pkg[i].PR2_In2      = NULL;
+//       task_pkg[i].SizePR2_In2  = task_pkg[i].len * 2;
+//       task_pkg[i].PR2_Out      = E;
+//       task_pkg[i].SizePR2_Out  = task_pkg[i].len * 4;
+// //////////////////////
+//       task_pkg[i].PR0_In1      = A;
+//       task_pkg[i].SizePR0_In1  = task_pkg[i].len;
+//       task_pkg[i].PR0_In2      = A;
+//       task_pkg[i].SizePR0_In2  = task_pkg[i].len;
+//       task_pkg[i].PR0_Out      = NULL;
+//       task_pkg[i].SizePR0_Out  = task_pkg[i].len;
+
+//       task_pkg[i].PR1_In1      = B;
+//       task_pkg[i].SizePR1_In1  = task_pkg[i].len;
+//       task_pkg[i].PR1_In2      = B;
+//       task_pkg[i].SizePR1_In2  = task_pkg[i].len;
+//       task_pkg[i].PR1_Out      = NULL;
+//       task_pkg[i].SizePR1_Out  = task_pkg[i].len;
+
+//       task_pkg[i].PR2_In1      = NULL;
+//       task_pkg[i].SizePR2_In1  = task_pkg[i].len;
+//       task_pkg[i].PR2_In2      = NULL;
+//       task_pkg[i].SizePR2_In2  = task_pkg[i].len;
+//       task_pkg[i].PR2_Out      = E;
+//       task_pkg[i].SizePR2_Out  = task_pkg[i].len;
+
+      // task_pkg[i].PR0_In1      = A;
+      // task_pkg[i].SizePR0_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      // task_pkg[i].PR0_In2      = NULL;
+      // task_pkg[i].SizePR0_In2  = 0;
+      // task_pkg[i].PR0_Out      = C;
+      // task_pkg[i].SizePR0_Out  = task_pkg[i].len * 2;
+
+      // task_pkg[i].PR1_In1      = B;
+      // task_pkg[i].SizePR1_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      // task_pkg[i].PR1_In2      = NULL;
+      // task_pkg[i].SizePR1_In2  = 0;
+      // task_pkg[i].PR1_Out      = D;
+      // task_pkg[i].SizePR1_Out  = task_pkg[i].len * 2;
+
+      // task_pkg[i].PR2_In1      = C;
+      // task_pkg[i].SizePR2_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      // task_pkg[i].PR2_In2      = D;
+      // task_pkg[i].SizePR2_In2  = task_pkg[i].len * 2; // 32 items, 64 numbers
+      // task_pkg[i].PR2_Out      = E;
+      // task_pkg[i].SizePR2_Out  = task_pkg[i].len * 4;
+
 
 /*
 11/13/15, VADD, SIZE: 524880000 = 1.9 GBytes
