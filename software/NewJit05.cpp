@@ -12,10 +12,12 @@
 #include <locale.h>
 
 using namespace std;
-#define SORT128
+#define SORT_RADIX2
+// #define SORT_RADIX
+// #define SORT128
 // #define SORT256
-// #define VERBOSE
-// #define VERBOSE_THREAD
+#define VERBOSE
+#define VERBOSE_THREAD
 // #define P_TEST
 #include "jit_isa.h"
 // 1024 * 10 * 1024
@@ -28,7 +30,7 @@ using namespace std;
 // FCCM Test:
 
 // #define THREADS 16
-#define SIZE 32
+#define SIZE 64
 // #define SIZE 0x10000
 // #define SIZE    (MAX_SIZE + 32) * THREADS
 // #define SIZE    65528 * THREADS
@@ -197,6 +199,37 @@ void * VMUL_Threads_Call(void *pk)
 
   int         items    = p->len;
   int         err;
+
+  #ifdef SORT_RADIX
+    err =   vnew(VM, nPR);                                                                                                errCheck(err, FUN_VNEW);
+    err =   vlpr(VM, nPR->at(0), RADIX);                                                                                   errCheck(err, FUN_VLPR);
+    err = vtieio(VM, nPR->at(0), p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, p->PR0_Out, p->SizePR0_Out);     errCheck(err, FUN_VTIEIO);
+    err = vstart(VM, nPR);                                                                                                errCheck(err, FUN_VSTART);
+    err =   vdel(VM, nPR);
+  #endif
+
+  #ifdef SORT_RADIX2
+    err =   vnew(VM, nPR);                                                                                                errCheck(err, FUN_VNEW);
+
+    err =   vlpr(VM, nPR->at(0),  RADIX);                                                                                 errCheck(err, FUN_VLPR);
+    err =   vlpr(VM, nPR->at(1),  RADIX);                                                                                 errCheck(err, FUN_VLPR);
+    err =   vlpr(VM, nPR->at(2),  RADIX);                                                                                 errCheck(err, FUN_VLPR);
+    err =   vlpr(VM, nPR->at(3),  RADIX);                                                                                 errCheck(err, FUN_VLPR);
+    err =   vlpr(VM, nPR->at(4),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+    err =   vlpr(VM, nPR->at(5),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+    err =   vlpr(VM, nPR->at(6),  MERGE);                                                                                 errCheck(err, FUN_VLPR);
+
+    err = vtieio(VM, nPR->at(0),  p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, nPR->at(4), p->SizePR0_Out);    errCheck(err, FUN_VTIEIO);
+    err = vtieio(VM, nPR->at(1),  p->PR1_In1, p->SizePR1_In1, p->PR1_In2, p->SizePR1_In2, nPR->at(4), p->SizePR1_Out);    errCheck(err, FUN_VTIEIO);
+    err = vtieio(VM, nPR->at(2),  p->PR2_In1, p->SizePR2_In1, p->PR2_In2, p->SizePR2_In2, nPR->at(5), p->SizePR2_Out);    errCheck(err, FUN_VTIEIO);
+    err = vtieio(VM, nPR->at(3),  p->PR3_In1, p->SizePR3_In1, p->PR3_In2, p->SizePR3_In2, nPR->at(5), p->SizePR3_Out);    errCheck(err, FUN_VTIEIO);
+    err = vtieio(VM, nPR->at(4),  nPR->at(0), p->SizePR4_In1, nPR->at(1), p->SizePR4_In2, nPR->at(6), p->SizePR4_Out);    errCheck(err, FUN_VTIEIO);
+    err = vtieio(VM, nPR->at(5),  nPR->at(2), p->SizePR5_In1, nPR->at(3), p->SizePR5_In2, nPR->at(6), p->SizePR5_Out);    errCheck(err, FUN_VTIEIO);
+    err = vtieio(VM, nPR->at(6),  nPR->at(4), p->SizePR6_In1, nPR->at(5), p->SizePR6_In2, p->PR6_Out, p->SizePR6_Out);    errCheck(err, FUN_VTIEIO);
+
+    err = vstart(VM, nPR);                                                                                                errCheck(err, FUN_VSTART);
+    err =   vdel(VM, nPR);                                                                                                errCheck(err, FUN_VDEL);
+  #endif
 
   #ifdef SORT256
   gettimeofday(&start, NULL);
@@ -546,51 +579,91 @@ int main(int argc, char* argv[])
     J[i] = -2;
     K[i] = -2;
   }
+  #ifdef SORT_RADIX
+  for (i = 0; i < SWSIZE; i++) {
+      A[i] = 900 - 0 - i * 8;
+      B[i] = 900 - 1 - i * 8;
+      C[i] = 900 - 2 - i * 8;
+      D[i] = 900 - 3 - i * 8;
+      E[i] = 900 - 4 - i * 8;
+      F[i] = 900 - 5 - i * 8;
+      G[i] = 900 - 6 - i * 8;
+      H[i] = 900 - 7 - i * 8;
 
-  for (i = 0; i < SWSIZE; i++) {
-    A[i] = 500 - 0 - i * 8;
-    B[i] = 500 - 1 - i * 8;
-    C[i] = 500 - 2 - i * 8;
-    D[i] = 500 - 3 - i * 8;
-    E[i] = 500 - 4 - i * 8;
-    F[i] = 500 - 5 - i * 8;
-    G[i] = 500 - 6 - i * 8;
-    H[i] = 500 - 7 - i * 8;
+      K[SWSIZE * 0 + i] = A[i];
+      K[SWSIZE * 1 + i] = B[i];
+      K[SWSIZE * 2 + i] = C[i];
+      K[SWSIZE * 3 + i] = D[i];
+      K[SWSIZE * 4 + i] = E[i];
+      K[SWSIZE * 5 + i] = F[i];
+      K[SWSIZE * 6 + i] = G[i];
+      K[SWSIZE * 7 + i] = H[i];
+    }
+  #endif
 
-    K[SWSIZE * 0 + i] = A[i];
-    K[SWSIZE * 1 + i] = B[i];
-    K[SWSIZE * 2 + i] = C[i];
-    K[SWSIZE * 3 + i] = D[i];
-    K[SWSIZE * 4 + i] = E[i];
-    K[SWSIZE * 5 + i] = F[i];
-    K[SWSIZE * 6 + i] = G[i];
-    K[SWSIZE * 7 + i] = H[i];
-  }
+  #ifdef SORT_RADIX2
+    for (i = 0; i < SWSIZE; i++) {
+      A[i] = 900 - 0 - i * 4;
+      B[i] = 900 - 1 - i * 4;
+      C[i] = 900 - 2 - i * 4;
+      D[i] = 900 - 3 - i * 4;
 
-  for (i = 0; i < SWSIZE; i++) {
-    A[SWSIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SWSIZE; i++) {
-    B[SWSIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SWSIZE; i++) {
-    C[SWSIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SWSIZE; i++) {
-    D[SWSIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SWSIZE; i++) {
-    E[SWSIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SWSIZE; i++) {
-    F[SWSIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SWSIZE; i++) {
-    G[SWSIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SWSIZE; i++) {
-    H[SWSIZE + i] = 0xDEADBEEF;
-  }
+      K[SWSIZE * 0 + i] = A[i];
+      K[SWSIZE * 1 + i] = B[i];
+      K[SWSIZE * 2 + i] = C[i];
+      K[SWSIZE * 3 + i] = D[i];
+      K[SWSIZE * 4 + i] = E[i];
+      K[SWSIZE * 5 + i] = F[i];
+      K[SWSIZE * 6 + i] = G[i];
+      K[SWSIZE * 7 + i] = H[i];
+    }
+  #endif
+
+
+  // for (i = 0; i < SWSIZE; i++) {
+  //   A[i] = 500 - 0 - i * 8;
+  //   B[i] = 500 - 1 - i * 8;
+  //   C[i] = 500 - 2 - i * 8;
+  //   D[i] = 500 - 3 - i * 8;
+  //   E[i] = 500 - 4 - i * 8;
+  //   F[i] = 500 - 5 - i * 8;
+  //   G[i] = 500 - 6 - i * 8;
+  //   H[i] = 500 - 7 - i * 8;
+
+  //   K[SWSIZE * 0 + i] = A[i];
+  //   K[SWSIZE * 1 + i] = B[i];
+  //   K[SWSIZE * 2 + i] = C[i];
+  //   K[SWSIZE * 3 + i] = D[i];
+  //   K[SWSIZE * 4 + i] = E[i];
+  //   K[SWSIZE * 5 + i] = F[i];
+  //   K[SWSIZE * 6 + i] = G[i];
+  //   K[SWSIZE * 7 + i] = H[i];
+  // }
+
+  // for (i = 0; i < SWSIZE; i++) {
+  //   A[SWSIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   B[SWSIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   C[SWSIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   D[SWSIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   E[SWSIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   F[SWSIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   G[SWSIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   H[SWSIZE + i] = 0xDEADBEEF;
+  // }
 
   //////////////////////////////////////////////////////////////////////////////
   gettimeofday(&start, NULL);
@@ -614,7 +687,7 @@ int main(int argc, char* argv[])
   // VM.VAM_TABLE->at(4).status  = 1;
   // VM.VAM_TABLE->at(5).status  = 1;
   // VM.VAM_TABLE->at(6).status  = 1;
-  VM.VAM_TABLE->at(7).status  = 1;
+  // VM.VAM_TABLE->at(7).status  = 1;
 
   // VM.VAM_TABLE->at(8).status  = 0;
   // VM.VAM_TABLE->at(9).status  = 0;
@@ -628,12 +701,21 @@ int main(int argc, char* argv[])
 
   {
     int THREADS = 1;
+
+    #ifdef SORT_RADIX
+      int STEPS = 1;
+    #endif
+
+    #ifdef SORT_RADIX2
+      int STEPS   = 7;
+    #endif
+
     #ifdef SORT128
-    int STEPS   = 7;
+      int STEPS   = 7;
     #endif
 
     #ifdef SORT256
-    int STEPS   = 15;
+      int STEPS   = 15;
     #endif
     pthread_t thread[THREADS];
     task_pk_t task_pkg[THREADS];
@@ -648,6 +730,67 @@ int main(int argc, char* argv[])
       task_pkg[i].VM      = &VM;
       task_pkg[i].nPR     = &nPR[i];
       task_pkg[i].len     = SIZE / THREADS;
+
+      #ifdef SORT_RADIX
+        task_pkg[i].PR0_In1      = A;
+        task_pkg[i].SizePR0_In1  = task_pkg[i].len;
+        task_pkg[i].PR0_In2      = NULL;
+        task_pkg[i].SizePR0_In2  = 0;
+        task_pkg[i].PR0_Out      = J;
+        task_pkg[i].SizePR0_Out  = task_pkg[i].len;
+      #endif
+
+      #ifdef SORT_RADIX2
+        task_pkg[i].PR0_In1      = A;
+        task_pkg[i].SizePR0_In1  = task_pkg[i].len; // 32 items, 64 numbers
+        task_pkg[i].PR0_In2      = NULL;
+        task_pkg[i].SizePR0_In2  = 0;
+        task_pkg[i].PR0_Out      = NULL;
+        task_pkg[i].SizePR0_Out  = task_pkg[i].len;
+
+        task_pkg[i].PR1_In1      = B;
+        task_pkg[i].SizePR1_In1  = task_pkg[i].len; // 32 items, 64 numbers
+        task_pkg[i].PR1_In2      = NULL;
+        task_pkg[i].SizePR1_In2  = 0;
+        task_pkg[i].PR1_Out      = NULL;
+        task_pkg[i].SizePR1_Out  = task_pkg[i].len;
+
+        task_pkg[i].PR2_In1      = C;
+        task_pkg[i].SizePR2_In1  = task_pkg[i].len; // 32 items, 64 numbers
+        task_pkg[i].PR2_In2      = NULL;
+        task_pkg[i].SizePR2_In2  = 0;
+        task_pkg[i].PR2_Out      = NULL;
+        task_pkg[i].SizePR2_Out  = task_pkg[i].len;
+
+        task_pkg[i].PR3_In1      = D;
+        task_pkg[i].SizePR3_In1  = task_pkg[i].len; // 32 items, 64 numbers
+        task_pkg[i].PR3_In2      = NULL;
+        task_pkg[i].SizePR3_In2  = 0;
+        task_pkg[i].PR3_Out      = NULL;
+        task_pkg[i].SizePR3_Out  = task_pkg[i].len;
+
+        task_pkg[i].PR4_In1      = NULL;
+        task_pkg[i].SizePR4_In1  = task_pkg[i].len;
+        task_pkg[i].PR4_In2      = NULL;
+        task_pkg[i].SizePR4_In2  = task_pkg[i].len;
+        task_pkg[i].PR4_Out      = NULL;
+        task_pkg[i].SizePR4_Out  = task_pkg[i].len * 2;
+
+        task_pkg[i].PR5_In1      = NULL;
+        task_pkg[i].SizePR5_In1  = task_pkg[i].len;
+        task_pkg[i].PR5_In2      = NULL;
+        task_pkg[i].SizePR5_In2  = task_pkg[i].len;
+        task_pkg[i].PR5_Out      = NULL;
+        task_pkg[i].SizePR5_Out  = task_pkg[i].len * 2;
+
+        task_pkg[i].PR6_In1      = NULL;
+        task_pkg[i].SizePR6_In1  = task_pkg[i].len;
+        task_pkg[i].PR6_In2      = NULL;
+        task_pkg[i].SizePR6_In2  = task_pkg[i].len;
+        task_pkg[i].PR6_Out      = E;
+        task_pkg[i].SizePR6_Out  = task_pkg[i].len * 2 * 2;
+      #endif
+
 #ifdef SORT256
       task_pkg[i].PR0_In1      = A;
       task_pkg[i].SizePR0_In1  = task_pkg[i].len * 2; // 32 items, 64 numbers
@@ -841,6 +984,12 @@ int main(int argc, char* argv[])
   delete[] D;
   delete[] E;
   delete[] F;
+  delete[] G;
+  delete[] H;
+  delete[] I;
+  delete[] J;
+  delete[] K;
+
   return 0;
 }
 

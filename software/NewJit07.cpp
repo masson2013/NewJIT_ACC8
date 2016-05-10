@@ -15,11 +15,11 @@ using namespace std;
 
 // #define VERBOSE
 // #define VERBOSE_THREAD
-#include "jit_isa.h"
-#define SIZE 32
+#define SIZE 1024 * 1024 * 256
 #define SWSIZE  SIZE
 #define MAX_SIZE   65528
 
+#include "jit_isa.h"
 // #define TIESTREAM
 #define BBB
 // #define BBR_RRB
@@ -142,13 +142,13 @@ void * VMUL_Threads_Call(void *pk)
     err =   vnew(VM, nPR);                                                                                                errCheck(err, FUN_VNEW);
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    printf("[DEBUG->task_thread:%2d] VNEW : \t%'9d us\r\n", 1, timeuse);
+    printf("[DEBUG->task_thread:%2d] VNEW   : \t%'9d us\r\n", 1, timeuse);
 
     gettimeofday(&start, NULL);
     err =   vlpr(VM, nPR->at(0), VADD);                                                                                   errCheck(err, FUN_VLPR);
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    printf("[DEBUG->task_thread:%2d] VLPR : \t%'9d us\r\n", 1, timeuse);
+    printf("[DEBUG->task_thread:%2d] VLPR   : \t%'9d us\r\n", 1, timeuse);
 
     gettimeofday(&start, NULL);
     err = vtieio(VM, nPR->at(0), p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, p->PR0_Out, p->SizePR0_Out);     errCheck(err, FUN_VTIEIO);
@@ -161,12 +161,13 @@ void * VMUL_Threads_Call(void *pk)
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
     printf("[DEBUG->task_thread:%2d] VSTRAT : \t%'9d us\r\n", 1, timeuse);
+    printf("[DEBUG->task_thread:%2d] TP     : \t  %'7.2f MB/s\r\n", 1, ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
 
     gettimeofday(&start, NULL);
     err =   vdel(VM, nPR);                                                                                                errCheck(err, FUN_VDEL);
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    printf("[DEBUG->task_thread:%2d] VDEL : \t%'9d us\r\n", 1, timeuse);
+    printf("[DEBUG->task_thread:%2d] VDEL   : \t%'9d us\r\n", 1, timeuse);
   #endif
 
   // // VADD BBB^
@@ -324,38 +325,44 @@ int main(int argc, char* argv[])
 {
   printf("Begin...\r\n");
   setlocale(LC_NUMERIC, ""); // for thounds seperator
-  printf("%'d\r\n", SIZE);
+
+  float KB = SIZE * 4.0 / 1024;
+  float MB = KB         / 1024;
+  float GB = MB         / 1024;
+  printf("SIZE: %'5d Words, %'5d Bytes, %'5.1f KB, %'5.1f MB, %'5.1f GB\r\n", SIZE, SIZE * 4, KB, MB, GB);
 
   struct timeval start, end;
   int timeuse;
 
-  int *A = new int[SWSIZE * 2 * 2 * 2];
-  int *B = new int[SWSIZE * 2 * 2 * 2];
-  int *C = new int[SWSIZE * 2 * 2 * 2];
-  int *D = new int[SWSIZE * 2 * 2 * 2];
-  int *E = new int[SWSIZE * 2 * 2 * 2];
-  int *F = new int[SWSIZE * 2 * 2 * 2];
+  int *A = new int[SWSIZE];
+  int *B = new int[SWSIZE];
+  int *C = new int[SWSIZE];
+  int *D = new int[SWSIZE];
+  int *E = new int[SWSIZE];
+  int *F = new int[SWSIZE];
 
   int i;
   int j;
   int sum;
 
-  for (i = 0; i < SWSIZE; i++) {
-    A[i] = -2;
-    B[i] = -2;
-    C[i] = -2;
-    D[i] = -2;
-    E[i] = -2;
-    F[i] = -2;
-  }
+  // for (i = 0; i < SWSIZE; i++) {
+  //   A[i] = -2;
+  //   B[i] = -2;
+  //   // C[i] = -2;
+  //   // D[i] = -2;
+  //   E[i] = -2;
+  //   F[i] = -2;
+  // }
 
   for (i = 0; i < SWSIZE; i++) {
     A[i] = i + 0;
     B[i] = i + 1;
-    C[i] = i + 2;
-    D[i] = i + 3;
-    E[i] = i + 4;
-    F[i] = i + 5;
+    // C[i] = i + 2;
+    // D[i] = i + 3;
+    // E[i] = i + 4;
+    // F[i] = i + 5;
+    E[i] = 0;
+    F[i] = 0;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -396,7 +403,8 @@ int main(int argc, char* argv[])
   }
   gettimeofday(&end, NULL);
   timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-  printf("CPU %'4d threads :\t%'9d us\r\n", 1, timeuse);
+  printf("CPU %'4d threads               :\t%'9d us\r\n", 1, timeuse);
+  printf("CPU TP                         :\t  %'7.2f MB/s\r\n", ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
   //////////////////////////////////////////////////////////////////////////////
   int err;
   vam_vm_t VM;
@@ -639,11 +647,12 @@ int main(int argc, char* argv[])
     }
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    printf("JIT %'4d threads :\t%'9d us\t", THREADS, timeuse);
+    printf("JIT %'4d threads               :\t%'9d us\r\n", THREADS, timeuse);
+    printf("JIT TP                         :\t  %'7.2f MB/s\r\n", ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
 
     printf("\r\n");
     for (i = 0; i < SWSIZE; i++) {
-      printf("%3d:\tA:%10d\tB:%10d\tC:%10d\tD:%10d\tE:%10d\tF:%10d\r\n", i, A[i], B[i], C[i], D[i], E[i], F[i]);
+      // printf("%3d:\tA:%10d\tB:%10d\tC:%10d\tD:%10d\tE:%10d\tF:%10d\r\n", i, A[i], B[i], C[i], D[i], E[i], F[i]);
       if (E[i] != F[i]) {
         printf("Error at %d:\tA:%d\tB:%d\tC:%d\tD:%d\r\nFailed!\r\n", i, A[i], B[i], C[i], D[i]);
         VAM_VM_CLEAN(&VM);

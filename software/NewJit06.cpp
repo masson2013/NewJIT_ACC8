@@ -21,12 +21,12 @@ using namespace std;
 #define MAX_SIZE   65528
 
 // #define BBB
-// #define BBR_RRB
+#define BBR_RRB
 // #define RBB
 // #define BRB
 // #define RBR
 // #define BRR
-#define RRR
+// #define RRR
 
 typedef struct {
   int key;

@@ -13,7 +13,7 @@
 using namespace std;
 
  #define VERBOSE
- // #define VERBOSE_THREAD
+ #define VERBOSE_THREAD
 // #define P_TEST
 #include "jit_isa.h"
 // 1024 * 10 * 1024
@@ -25,9 +25,9 @@ using namespace std;
 // 26214400  = 100 MBytes
 // FCCM Test:
 
-#define THREADS 16
+#define THREADS 1
 // #define SIZE    (MAX_SIZE + 32) * THREADS
-#define SIZE    65528
+#define SIZE    1024 * 1024 * 50
 
 #define SWSIZE  SIZE
 #define STEPS   1
@@ -52,12 +52,12 @@ typedef struct {
   vam_vm_t     *VM;
   vector<int>  *nPR;
   int len;
-  int     *In1;
-  int     SizeIn1;
-  int     *In2;
-  int     SizeIn2;
-  int     *Out;
-  int     SizeOut;
+  int        *PR0_In1;
+  int     SizePR0_In1;
+  int        *PR0_In2;
+  int     SizePR0_In2;
+  int        *PR0_Out;
+  int     SizePR0_Out;
 }task_pk_t;
 
 void * threads_call(void* ptr)
@@ -80,48 +80,83 @@ void * VMUL_Threads_Call(void *pk)
 #ifdef VERBOSE_THREAD
   printf("[DEBUG->task_thread:%2d] task thread start\r\n", p->task_id);
 #endif
+  struct timeval start, end;
+  int timeuse;
   vam_vm_t    *VM      = p->VM;
   vector<int> *nPR     = p->nPR;
-  int         items    = p->len;
-  int         *In1     = p->In1;
-  int         sizeIn1  ;
-  int         *In2     = p->In2;
-  int         sizeIn2  ;
-  int         *Out     = p->Out;
-  int         sizeOut  ;
+  // int         items    = p->len;
+  // int         *In1     = p->In1;
+  // int         sizeIn1  ;
+  // int         *In2     = p->In2;
+  // int         sizeIn2  ;
+  // int         *Out     = p->Out;
+  // int         sizeOut  ;
   int         err;
 
-  int         iter     = items / MAX_SIZE;
-  int         reminder = items - iter * MAX_SIZE;
-#ifdef VERBOSE_THREAD
-  printf("[DEBUG->task_thread:%2d] iter:%d\r\n", p->task_id, iter);
-  printf("[DEBUG->task_thread:%2d] reminder:%d\r\n", p->task_id, reminder);
-#endif
+  // int         iter     = items / MAX_SIZE;
+  // int         reminder = items - iter * MAX_SIZE;
 
-  if (items >= MAX_SIZE) {
-    sizeIn1  = MAX_SIZE;
-    sizeIn2  = MAX_SIZE;
-    sizeOut  = MAX_SIZE;
-  }
-  else {
-    sizeIn1  = p->SizeIn1;
-    sizeIn2  = p->SizeIn2;
-    sizeOut  = p->SizeOut;
-  }
+    gettimeofday(&start, NULL);
+    err =   vnew(VM, nPR);                                                                                                errCheck(err, FUN_VNEW);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    printf("[DEBUG->task_thread:%2d] VNEW   : \t%'9d us\r\n", p->task_id, timeuse);
 
-  err =   vnew(VM, nPR);                                                        errCheck(err, FUN_VNEW);
-  err =   vlpr(VM, nPR->at(0),  VMUL);                                          errCheck(err, FUN_VLPR);
-  err = vtieio(VM, nPR->at(0),  In1,  In2,  Out, sizeIn1);                      errCheck(err, FUN_VTIEIO);
+    gettimeofday(&start, NULL);
+    err =   vlpr(VM, nPR->at(0), VADD);                                                                                   errCheck(err, FUN_VLPR);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    printf("[DEBUG->task_thread:%2d] VLPR   : \t%'9d us\r\n", p->task_id, timeuse);
 
-  for (int i = 0; i < iter; i++) {
-    err = vstart(VM, nPR, MAX_SIZE, MAX_SIZE, MAX_SIZE);                        errCheck(err, FUN_VSTART);
-  }
+    gettimeofday(&start, NULL);
+    err = vtieio(VM, nPR->at(0), p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, p->PR0_Out, p->SizePR0_Out);     errCheck(err, FUN_VTIEIO);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    printf("[DEBUG->task_thread:%2d] VTIEIO : \t%'9d us\r\n", p->task_id, timeuse);
 
-  if (reminder != 0) {
-    err = vtieio(VM, nPR->at(0),  In1,  In2,  Out, reminder);                      errCheck(err, FUN_VTIEIO);
-    err = vstart(VM, nPR, reminder, reminder, reminder);                        errCheck(err, FUN_VSTART);
-  }
-  err =   vdel(VM, nPR);                                                        errCheck(err, FUN_VDEL);
+    gettimeofday(&start, NULL);
+    err = vstart(VM, nPR);                                                                                                errCheck(err, FUN_VSTART);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    printf("[DEBUG->task_thread:%2d] VSTRAT : \t%'9d us\r\n", p->task_id, timeuse);
+    printf("[DEBUG->task_thread:%2d] TP     : \t  %'7.2f MB/s\r\n", p->task_id, ((p->SizePR0_Out * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+
+    gettimeofday(&start, NULL);
+    err =   vdel(VM, nPR);                                                                                                errCheck(err, FUN_VDEL);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    printf("[DEBUG->task_thread:%2d] VDEL   : \t%'9d us\r\n", p->task_id, timeuse);
+
+
+// #ifdef VERBOSE_THREAD
+//   printf("[DEBUG->task_thread:%2d] iter:%d\r\n", p->task_id, iter);
+//   printf("[DEBUG->task_thread:%2d] reminder:%d\r\n", p->task_id, reminder);
+// #endif
+
+//   if (items >= MAX_SIZE) {
+//     sizeIn1  = MAX_SIZE;
+//     sizeIn2  = MAX_SIZE;
+//     sizeOut  = MAX_SIZE;
+//   }
+//   else {
+//     sizeIn1  = p->SizeIn1;
+//     sizeIn2  = p->SizeIn2;
+//     sizeOut  = p->SizeOut;
+//   }
+
+//   err =   vnew(VM, nPR);                                                        errCheck(err, FUN_VNEW);
+//   err =   vlpr(VM, nPR->at(0),  VMUL);                                          errCheck(err, FUN_VLPR);
+//   err = vtieio(VM, nPR->at(0),  In1,  In2,  Out, sizeIn1);                      errCheck(err, FUN_VTIEIO);
+
+//   for (int i = 0; i < iter; i++) {
+//     err = vstart(VM, nPR, MAX_SIZE, MAX_SIZE, MAX_SIZE);                        errCheck(err, FUN_VSTART);
+//   }
+
+//   if (reminder != 0) {
+//     err = vtieio(VM, nPR->at(0),  In1,  In2,  Out, reminder);                      errCheck(err, FUN_VTIEIO);
+//     err = vstart(VM, nPR, reminder, reminder, reminder);                        errCheck(err, FUN_VSTART);
+//   }
+//   err =   vdel(VM, nPR);                                                        errCheck(err, FUN_VDEL);
 #ifdef VERBOSE_THREAD
   printf("[DEBUG->task_thread] task thread done\r\n");
 #endif
@@ -131,6 +166,12 @@ void * VMUL_Threads_Call(void *pk)
 int main(int argc, char* argv[])
 {
   printf("Begin...\r\n");
+  setlocale(LC_NUMERIC, ""); // for thounds seperator
+
+  float KB = SIZE * 4.0 / 1024;
+  float MB = KB         / 1024;
+  float GB = MB         / 1024;
+  printf("SIZE: %'5d Words, %'5d Bytes, %'5.1f KB, %'5.1f MB, %'5.1f GB\r\n", SIZE, SIZE * 4, KB, MB, GB);
 
   int *A = new int[SWSIZE];
   int *B = new int[SWSIZE];
@@ -151,22 +192,23 @@ int main(int argc, char* argv[])
   struct timeval start, end;
   gettimeofday(&start, NULL);
   for (i = 0; i < SWSIZE; i++) {
-    C[i] = A[i] * B[i];
+    C[i] = A[i] + B[i];
   }
   gettimeofday(&end, NULL);
 
   int timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-  printf("CPU %4d threads :\t%9d us\r\n", 1, timeuse);
+  printf("CPU %'4d threads               :\t%'9d us\r\n", 1, timeuse);
+  printf("CPU TP                         :\t %'7.2f MB/s\r\n", ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
 
-  pe_t package[THREADS];
-  for (i = 0; i < THREADS; i++) {
-    package[i].key = i;
-    package[i].len = SIZE / THREADS;
-    // int alignment_buf
-    package[i].A = &A[i * package[i].len];
-    package[i].B = &B[i * package[i].len];
-    package[i].C = &D[i * package[i].len];
-  }
+  // pe_t package[THREADS];
+  // for (i = 0; i < THREADS; i++) {
+  //   package[i].key = i;
+  //   package[i].len = SIZE / THREADS;
+  //   // int alignment_buf
+  //   package[i].A = &A[i * package[i].len];
+  //   package[i].B = &B[i * package[i].len];
+  //   package[i].C = &D[i * package[i].len];
+  // }
   //////////////////////////////////////////////////////////////////////////////
   int err;
   vam_vm_t VM;
@@ -184,16 +226,16 @@ int main(int argc, char* argv[])
   }
 
   for (i = 0; i < THREADS; i++) {
-    task_pkg[i].task_id = i;
-    task_pkg[i].VM      = &VM;
-    task_pkg[i].nPR     = &nPR[i];
-    task_pkg[i].len     = SIZE / THREADS;
-    task_pkg[i].In1     = &A[i * task_pkg[i].len];
-    task_pkg[i].SizeIn1 = task_pkg[i].len;
-    task_pkg[i].In2     = &B[i * task_pkg[i].len];
-    task_pkg[i].SizeIn2 = task_pkg[i].len;
-    task_pkg[i].Out     = &D[i * task_pkg[i].len];
-    task_pkg[i].SizeOut = task_pkg[i].len;
+    task_pkg[i].task_id      = i;
+    task_pkg[i].VM           = &VM;
+    task_pkg[i].nPR          = &nPR[i];
+    task_pkg[i].len          = SIZE / THREADS;
+    task_pkg[i].PR0_In1      = &A[i * task_pkg[i].len];
+    task_pkg[i].SizePR0_In1  = task_pkg[i].len;
+    task_pkg[i].PR0_In2      = &B[i * task_pkg[i].len];
+    task_pkg[i].SizePR0_In2  = task_pkg[i].len;
+    task_pkg[i].PR0_Out      = &D[i * task_pkg[i].len];
+    task_pkg[i].SizePR0_Out  = task_pkg[i].len;
   }
 
   gettimeofday(&start, NULL);
@@ -205,7 +247,9 @@ int main(int argc, char* argv[])
   }
   gettimeofday(&end, NULL);
   timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-  printf("JIT %4d threads :\t%9d us\r\n", THREADS, timeuse);
+  printf("JIT %'4d threads               :\t%'9d us\r\n", THREADS, timeuse);
+  printf("JIT TP                         :\t  %'7.2f MB/s\r\n", ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+
 
   for (i = 0; i < 10; i++) {
     printf("%d:\tA:%d\tB:%d\tC:%d\tD:%d\r\n", i, A[i], B[i], C[i], D[i]);
