@@ -1,6 +1,6 @@
 #include "jit_bit.h"
 
-#define CARD            1
+#define CARD            2
 #define NUM_ACCs        8
 #define PR
 // #define AVAILABLE
@@ -610,7 +610,9 @@ void VAM_VM_INIT(vam_vm_t *VM, int argc, char* argv[])
         }
       }
       // Init TieStream Table
+      #ifdef VERBOSE
       printf("[DEBUG->VAM_VM_INIT] Create TieStreamTable\r\n");
+      #endif
       VM->file = fopen(".TieStreamTable", "r+");
       if (VM->file == NULL) {
         printf("[DEBUG->VAM_VM_INIT] TieStreamTable Error\r\n");
@@ -2133,6 +2135,23 @@ int vstart(vam_vm_t *VM, vector<int> *nPR)//, int size_in1, int size_in2, int si
         #endif
           threadsRet[i][WRITE_IN2] = pthread_create(&threads[i][WRITE_IN2], NULL, Stream_Threads_Call, (void*) &package[i][WRITE_IN2]);
         }
+
+        // if (package[i][WRITE_IN1].buf  != NULL)
+        //   pthread_join(threads[i][WRITE_IN1], NULL);
+        // #ifdef VERBOSE
+        //   printf("[DEBUG->vstart join] Buf_Buf_Buf, Thread Write IN1 Join, nPR:%d, Card:%d, Node:%d, index:%d\r\n", nPR->at(i), card, node, index);
+        // #endif
+
+        // if (package[i][WRITE_IN2].buf != NULL)
+        //   pthread_join(threads[i][WRITE_IN2], NULL);
+        // #ifdef VERBOSE
+        //   printf("[DEBUG->vstart join] Buf_Buf_Buf, Thread Write IN2 Join, nPR:%d, Card:%d, Node:%d, index:%d\r\n", nPR->at(i), card, node, index);
+        // #endif
+
+        // pthread_join(threads[i][READ_OUT],  NULL);
+        // #ifdef VERBOSE
+        //   printf("[DEBUG->vstart join] Buf_Buf_Buf, Thread Read  OUT Join, nPR:%d, Card:%d, Node:%d, index:%d\r\n", nPR->at(i), card, node, index);
+        // #endif
 
         // if (package[WRITE_IN1].buf != NULL)
         //   pthread_join(threads[i][WRITE_IN1], NULL);

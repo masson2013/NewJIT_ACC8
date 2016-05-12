@@ -12,8 +12,8 @@
 
 using namespace std;
 
- #define VERBOSE
- #define VERBOSE_THREAD
+ // #define VERBOSE
+ // #define VERBOSE_THREAD
 // #define P_TEST
 #include "jit_isa.h"
 // 1024 * 10 * 1024
@@ -25,25 +25,26 @@ using namespace std;
 // 26214400  = 100 MBytes
 // FCCM Test:
 
-#define THREADS 1
-
-// #define SIZE    32
+#define THREADS 16
+#define SIZE    1024 * 1024 / 4 * 128
 // #define SWSIZE  SIZE
 #define STEPS   1
 
 typedef struct {
-  int          task_id;
-  vam_vm_t     *VM;
-  vector<int>  *nPR;
-  int len;
-  int        *PR0_In1;
-  int     SizePR0_In1;
-  int        *PR0_In2;
-  int     SizePR0_In2;
-  int        *PR0_Out;
-  int     SizePR0_Out;
+  int             task_id;
+  vam_vm_t        *VM;
+  vector<int>     *nPR;
+  struct timeval  start;
+  struct timeval  end;
+  int             timeuse;
+  int             len;
+  int             *PR0_In1;
+  int          SizePR0_In1;
+  int             *PR0_In2;
+  int          SizePR0_In2;
+  int             *PR0_Out;
+  int          SizePR0_Out;
 }task_pk_t;
-
 
 void InsertionSort(int array[], int len)
 {
@@ -175,85 +176,188 @@ void radixSort(int * array, int size){
   delete[] semiSorted;
 }
 
+void * Threads_Call(void *pk)
+{
+#ifdef VERBOSE_THREAD
+  printf("\r\n");
+#endif
+
+  struct timeval start, end;
+  int timeuse;
+
+  task_pk_t *p      = (task_pk_t*) pk;
+#ifdef VERBOSE_THREAD
+  printf("[DEBUG->task_thread:%2d] task thread start\r\n", p->task_id);
+#endif
+  vam_vm_t    *VM      = p->VM;
+  vector<int> *nPR     = p->nPR;
+  int         err;
+
+  err =   vnew(VM, nPR);                                                                                                errCheck(err, FUN_VNEW);
+  err =   vlpr(VM, nPR->at(0), VADD);                                                                                   errCheck(err, FUN_VLPR);
+  err = vtieio(VM, nPR->at(0), p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, p->PR0_Out, p->SizePR0_Out);     errCheck(err, FUN_VTIEIO);
+  gettimeofday(&p->start, NULL);
+  err = vstart(VM, nPR);                                                                                                errCheck(err, FUN_VSTART);
+  gettimeofday(&p->end, NULL);
+  p->timeuse = 1000000 * (p->end.tv_sec - p->start.tv_sec) + p->end.tv_usec - p->start.tv_usec;
+  err =   vdel(VM, nPR);
+
+
+#ifdef VERBOSE_THREAD
+  printf("[DEBUG->task_thread:%2d] Thread Done\r\n", p->task_id);
+#endif
+  return NULL;
+}
+
+int FindMaxTime(int array[], int size)
+{
+  int i;
+  int MAX = 0;
+  for (i = 1; i < size; i++) {
+    if (array[MAX] < array[i]) MAX = i;
+  }
+  return array[MAX];
+}
+
+
 int main(int argc, char* argv[])
 {
   printf("Begin...\r\n");
   setlocale(LC_NUMERIC, ""); // for thounds seperator
-
-  int MAXSIZE = 10;
-  int SIZE    = 1024 * 1024 / 4 / 4;
-  int i;
-  int j;
-  int sum;
-  struct timeval start, end;
-
-  for (j = 0; j < MAXSIZE; j++) {
-    SIZE = SIZE * 2;
-    float KB = SIZE * 4.0 / 1024;
-    float MB = KB         / 1024;
-    float GB = MB         / 1024;
-    // printf("SIZE: %'5d Words, %'5d Bytes, %'5.1f KB, %'5.1f MB, %'5.1f GB\r\n", SIZE, SIZE * 4, KB, MB, GB);
-
-    int *A = new int[sizeof(int) * SIZE];
-    int *B = new int[sizeof(int) * SIZE];
-    int *C = new int[sizeof(int) * SIZE];
-    int *D = new int[sizeof(int) * SIZE];
-
-    srand(time(NULL));
-    for (i = 0; i < SIZE; i++) {
-      A[i] = rand() % 1000;
-      B[i] = rand() % 1000;
-      C[i] = 0;
-      D[i] = A[i];
-    }
-
-    //////////////////////////////////////////////////////////////////////////////
-    // printf("Calculating SW...\r\n");
-    gettimeofday(&start, NULL);
-    MergeSort(A, SIZE);
-    // InsertionSort(A, SIZE);
-    // radixSort(A, SIZE);
-
-    for (i = 0; i < SIZE; i++) {
-      // C[i] = A[i] + B[i];
-      // C[i] = A[i] * B[i];
-    }
-    gettimeofday(&end, NULL);
-    int timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    printf("CPU[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", j, MB, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
-    // printf("CPU[%4d] Size: %'10d Words\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", j, SIZE, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
-    // printf("CPU %'4d threads               :\t%'9d us\r\n", 1, timeuse);
-    // printf("CPU TP                         :\t %'7.2f MB/s\r\n", ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
-
-    for (i = 0; i < 10; i++) {
-      // printf("%'5d:\tA:%'5d\tB:%'5d\tC:%'5d\tD:%'5d\r\n", i, A[SIZE - (10 - i)], B[SIZE - (10 - i)], C[SIZE - (10 - i)], D[SIZE - (10 - i)]);
-    }
-
-    delete[] A;
-    delete[] B;
-    delete[] C;
-    delete[] D;
-    //////////////////////////////////////////////////////////////////////////////
-  }
-
-
-
-
 
   int err;
   vam_vm_t VM;
   VM.VAM_TABLE = NULL;
   VM.BITSTREAM_TABLE = NULL;
   VAM_VM_INIT(&VM, argc, argv);
+
+  // int MAXSIZE = 1;
+  // int SIZE    = 1024 * 1024 / 4 * 64;//1024 * 1024 / 4 * 128 / 2; //1024 * 1024 / 4 / 2;
+  int i;
+  int j;
+  int sum;
+  struct timeval start, end;
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  float KB = SIZE * 4.0 / 1024;
+  float MB = KB         / 1024;
+  float GB = MB         / 1024;
+  // printf("SIZE: %'5d Words, %'5d Bytes, %'5.1f KB, %'5.1f MB, %'5.1f GB\r\n", SIZE, SIZE * 4, KB, MB, GB);
+
+  int *A = new int[sizeof(int) * SIZE];
+  int *B = new int[sizeof(int) * SIZE];
+  int *C = new int[sizeof(int) * SIZE];
+  int *D = new int[sizeof(int) * SIZE];
+
+  srand(time(NULL));
+  for (i = 0; i < SIZE; i++) {
+    A[i] = rand() % 1000;
+    B[i] = rand() % 1000;
+    C[i] = 0;
+    D[i] = 0;
+  }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  gettimeofday(&start, NULL);
+  for (i = 0; i < SIZE; i++) {
+    C[i] = A[i] + B[i];
+    // C[i] = A[i] * B[i];
+  }
+  // MergeSort(A, SIZE);
+  // InsertionSort(A, SIZE);
+  // radixSort(A, SIZE);
+  gettimeofday(&end, NULL);
+  int timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("CPU[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", j, MB, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+  // printf("CPU[%4d] Size: %'10d Words\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", j, SIZE, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+  // printf("CPU %'4d threads               :\t%'9d us\r\n", 1, timeuse);
+  // printf("CPU TP                         :\t %'7.2f MB/s\r\n", ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+  // for (i = 0; i < 10; i++) {
+    // printf("%'5d:\tA:%'5d\tB:%'5d\tC:%'5d\tD:%'5d\r\n", i, A[SIZE - (10 - i)], B[SIZE - (10 - i)], C[SIZE - (10 - i)], D[SIZE - (10 - i)]);
+  // }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  pthread_t thread[THREADS];
+  task_pk_t task_pkg[THREADS];
+
+  vector<vector<int> > nPR(THREADS);
+  for (i = 0; i < THREADS; i++) {
+    nPR[i].resize(STEPS);
+  }
+
+  for (i = 0; i < THREADS; i++) {
+    task_pkg[i].task_id = i;
+    task_pkg[i].VM      = &VM;
+    task_pkg[i].nPR     = &nPR[i];
+    task_pkg[i].timeuse = 0;
+    task_pkg[i].len     = SIZE / THREADS;
+
+    task_pkg[i].PR0_In1      = &A[i * task_pkg[i].len];
+    task_pkg[i].SizePR0_In1  = task_pkg[i].len;
+    task_pkg[i].PR0_In2      = &B[i * task_pkg[i].len];
+    task_pkg[i].SizePR0_In2  = task_pkg[i].len;
+    task_pkg[i].PR0_Out      = &D[i * task_pkg[i].len];
+    task_pkg[i].SizePR0_Out  = task_pkg[i].len;
+  }
+
+  gettimeofday(&start, NULL);
+  for (i = 0; i < THREADS; i++) {
+    pthread_create(&thread[i], NULL, Threads_Call, (void *)&task_pkg[i]);
+  }
+  for (i = 0; i < THREADS; i++) {
+    pthread_join(thread[i], NULL);
+  }
+  gettimeofday(&end, NULL);
+  timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("JIT[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\t", THREADS, MB, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+
+  int flag = 0;
+  for (i = 0; i < SIZE; i++) {
+    // printf("[%3d]|\tA:%6d\t|B:%6d\t|C:%6d\t|D:%6d\t|E:%6d|\r\n", i, A[i], B[i], C[i], D[i]);
+    if (C[i] != D[i]) {
+      printf("Error!\r\n[%3d]|\tA:%6d\t|B:%6d\t|C:%6d\t|D:%6d\t|\r\n", i, A[i], B[i], C[i], D[i]);
+      flag = 1;
+      break;
+    }
+  }
+
+  long int start_t = 1000000 * task_pkg[0].start.tv_sec + task_pkg[0].start.tv_usec;
+  long int end_t   = 1000000 * task_pkg[0].end.tv_sec   + task_pkg[0].end.tv_usec;
+  long int stmp;
+  long int etmp;
+  if (flag == 0) printf("Passed\r\n");
+  for (i = 0; i < THREADS; i++) {
+    stmp = 1000000 * task_pkg[i].start.tv_sec + task_pkg[i].start.tv_usec;
+    start_t = start_t > stmp ? stmp : start_t;
+
+    etmp = 1000000 * task_pkg[i].end.tv_sec   + task_pkg[i].end.tv_usec;
+    end_t = end_t < etmp ? etmp : end_t;
+
+    // printf("   [%4d] start %'10ld | end %'10ld |\r\n", i, stmp, etmp);
+    // printf("   [%4d] start %'10ld, %'10ld | end %'10ld, %'10ld\r\n", i, task_pkg[i].start.tv_sec, task_pkg[i].start.tv_usec, task_pkg[i].end.tv_sec, task_pkg[i].end.tv_usec);
+  }
+  // printf("   [%4d] start %'10ld | end %'10ld |\r\n", i, start_t, end_t);
+  timeuse = 0;
+  for (i = 0; i < THREADS; i++) {
+    timeuse = timeuse < task_pkg[i].timeuse ? task_pkg[i].timeuse : timeuse;
+    printf("   [%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", i, MB, task_pkg[i].timeuse, ((task_pkg[i].len * 4.0 / 1024 / 1024) / (task_pkg[i].timeuse * 1.0 / 1000000)));
+  }
+  printf("JIT[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", THREADS, MB, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+  timeuse = end_t - start_t;
+  printf("JIT[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", THREADS, MB, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+  printf("\r\n");
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+  VAM_VM_CLEAN(&VM);
+  delete[] A;
+  delete[] B;
+  delete[] C;
+  delete[] D;
+  return 0;
+}
+
   // VAM_TABLE_SHOW(VM);
 
   // pthread_t thread[THREADS];
   // task_pk_t task_pkg[THREADS];
 
-  // vector<vector<int> > nPR(THREADS);
-  // for (i = 0; i < THREADS; i++) {
-  //   nPR[i].resize(STEPS);
-  // }
 
   // for (i = 0; i < THREADS; i++) {
   //   task_pkg[i].task_id      = i;
@@ -281,24 +385,7 @@ int main(int argc, char* argv[])
   // printf("JIT TP                         :\t  %'7.2f MB/s\r\n", ((SIZE * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
 
 
-  // for (i = 0; i < 10; i++) {
-  //   printf("%d:\tA:%d\tB:%d\tC:%d\tD:%d\r\n", i, A[i], B[i], C[i], D[i]);
-  //   if (C[i] != D[i]) {
-  //     printf("Error at %d:\tA:%d\tB:%d\tC:%d\tD:%d\r\nFailed!\r\n", i, A[i], B[i], C[i], D[i]);
-  //     VAM_VM_CLEAN(&VM);
-  //     delete[] A;
-  //     delete[] B;
-  //     delete[] C;
-  //     delete[] D;
-  //     exit(1);
-  //   }
-  // }
 
-
-  // printf("Passed!\r\n");
-  VAM_VM_CLEAN(&VM);
-  return 0;
-}
 
 /*
 
@@ -501,6 +588,34 @@ CPU[   9] Size:     512.00 MB ExE Time:  3,357,308 us Throughput:     152.50 MB/
 
 
 
+
+
+/*
+
+CPU[   0] Size:       1.00 MB ExE Time:        253 us Throughput:   3,952.57 MB/s
+JIT[   0] Size:       1.00 MB ExE Time:      2,872 us Throughput:     348.19 MB/s Passed!
+
+CPU[   1] Size:       2.00 MB ExE Time:        240 us Throughput:   8,333.33 MB/s
+JIT[   1] Size:       2.00 MB ExE Time:      5,471 us Throughput:     365.56 MB/s Passed!
+
+CPU[   2] Size:       4.00 MB ExE Time:        872 us Throughput:   4,587.16 MB/s
+JIT[   2] Size:       4.00 MB ExE Time:     10,888 us Throughput:     367.38 MB/s Passed!
+
+CPU[   3] Size:       8.00 MB ExE Time:      1,898 us Throughput:   4,214.96 MB/s
+JIT[   3] Size:       8.00 MB ExE Time:     21,887 us Throughput:     365.51 MB/s Passed!
+
+CPU[   4] Size:      16.00 MB ExE Time:      3,599 us Throughput:   4,445.68 MB/s
+JIT[   4] Size:      16.00 MB ExE Time:     43,603 us Throughput:     366.95 MB/s Passed!
+
+CPU[   5] Size:      32.00 MB ExE Time:      6,727 us Throughput:   4,756.95 MB/s
+JIT[   5] Size:      32.00 MB ExE Time:     87,628 us Throughput:     365.18 MB/s Passed!
+
+CPU[   6] Size:      64.00 MB ExE Time:     13,001 us Throughput:   4,922.70 MB/s
+JIT[   6] Size:      64.00 MB ExE Time:    174,425 us Throughput:     366.92 MB/s Passed!
+
+*/
+
+
 // void * threads_call(void* ptr)
 // {
 //   pe_t *p = (pe_t *)ptr;
@@ -605,3 +720,93 @@ void * VMUL_Threads_Call(void *pk)
   return NULL;
 }
 */
+
+
+
+/*
+  for (j = 0; j < MAXSIZE; j++) {
+    SIZE = SIZE * 2;
+    float KB = SIZE * 4.0 / 1024;
+    float MB = KB         / 1024;
+    float GB = MB         / 1024;
+    // printf("SIZE: %'5d Words, %'5d Bytes, %'5.1f KB, %'5.1f MB, %'5.1f GB\r\n", SIZE, SIZE * 4, KB, MB, GB);
+
+
+
+    vector<vector<int> > nPR(THREADS);
+    for (i = 0; i < THREADS; i++) {
+      nPR[i].resize(STEPS);
+    }
+
+    // task_pk_t task_pkg[THREADS];
+    task_pk_t *pk = new task_pk_t;
+
+    pk->task_id      = 0;
+    pk->VM           = &VM;
+    pk->nPR          = &nPR[0];
+    pk->len          = SIZE / THREADS;
+    pk->PR0_In1      = &A[0 * pk->len];
+    pk->SizePR0_In1  = pk->len;
+    pk->PR0_In2      = &B[0 * pk->len];
+    pk->SizePR0_In2  = pk->len;
+    pk->PR0_Out      = &D[0 * pk->len];
+    pk->SizePR0_Out  = pk->len;
+
+    vector<int>  *PPR;
+    PPR = &nPR[0];
+
+    task_pk_t *p      = (task_pk_t*) pk;
+    gettimeofday(&start, NULL);
+    err =   vnew(&VM, PPR);                                                                                                errCheck(err, FUN_VNEW);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    // printf("[DEBUG->task_thread:%2d] VNEW   : \t%'9d us\r\n", p->task_id, timeuse);
+
+    gettimeofday(&start, NULL);
+    err =   vlpr(&VM, PPR->at(0), VADD);                                                                                   errCheck(err, FUN_VLPR);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    // printf("[DEBUG->task_thread:%2d] VLPR   : \t%'9d us\r\n", p->task_id, timeuse);
+
+    gettimeofday(&start, NULL);
+    err = vtieio(&VM, PPR->at(0), p->PR0_In1, p->SizePR0_In1, p->PR0_In2, p->SizePR0_In2, p->PR0_Out, p->SizePR0_Out);     errCheck(err, FUN_VTIEIO);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    // printf("[DEBUG->task_thread:%2d] VTIEIO : \t%'9d us\r\n", p->task_id, timeuse);
+
+    gettimeofday(&start, NULL);
+    err = vstart(&VM, PPR);                                                                                                errCheck(err, FUN_VSTART);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    // printf("[DEBUG->task_thread:%2d] VSTRAT : \t%'9d us\r\n", p->task_id, timeuse);
+    // printf("[DEBUG->task_thread:%2d] TP     : \t  %'7.2f MB/s\r\n", p->task_id, ((p->SizePR0_Out * 1 * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+    printf("JIT[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\t", j, MB, timeuse, ((p->SizePR0_Out * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+
+    gettimeofday(&start, NULL);
+    err =   vdel(&VM, PPR);                                                                                                errCheck(err, FUN_VDEL);
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    // printf("[DEBUG->task_thread:%2d] VDEL   : \t%'9d us\r\n", p->task_id, timeuse);
+
+    for (i = 0; i < SIZE; i++) {
+      // printf("%d:\tA:%d\tB:%d\tC:%d\tD:%d\r\n", i, A[i], B[i], C[i], D[i]);
+      if (C[i] != D[i]) {
+        printf("Error at %d:\tA:%d\tB:%d\tC:%d\tD:%d\r\nFailed!\r\n", i, A[i], B[i], C[i], D[i]);
+        VAM_VM_CLEAN(&VM);
+        delete[] pk;
+        delete[] A;
+        delete[] B;
+        delete[] C;
+        delete[] D;
+        exit(1);
+      }
+    }
+    printf("Passed!\r\n\r\n");
+    delete[] pk;
+    delete[] A;
+    delete[] B;
+    delete[] C;
+    delete[] D;
+    //////////////////////////////////////////////////////////////////////////////
+  }
+  */

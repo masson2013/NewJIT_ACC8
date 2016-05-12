@@ -2,15 +2,93 @@
 #include <string.h>
 #include <stdio.h>
 #include <picodrv.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include <locale.h>
 #include <pico_errors.h>
 #include "jit_bit.h"
 
-#define SIZE 32
+#define SIZE 1024 * 1024 / 4 * 128 * 4
+#define TSTREAM
+#define VERBOSE_THREAD
+// #define AVAILABLE
 // #define ACC1
-// #define PR
+#define PR
+
+#define WS              0
+#define RS              1
+
+typedef struct
+{
+    PicoDrv     *Pico     ;
+    int          Type     ;
+    uint32_t     Stream   ;
+    int         *In_Data  ;
+    int         *Out_Data ;
+    int          Size     ;
+}task_pk_t;
+
+
+void * Stream_Threads_Call(void *pk)
+{
+#ifdef VERBOSE_THREAD
+  printf("\r\n");
+#endif
+  task_pk_t *p = (task_pk_t *)pk;
+  int err, i;
+  char      ibuf[1024];
+  PicoDrv   *pico     = p->Pico;
+  int       type      = p->Type;
+  uint32_t  stream    = p->Stream;
+  int       *In_Data  = p->In_Data;
+  int       *Out_Data = p->Out_Data;
+  int       items     = p->Size * 4;
+
+  if (type == WS) {
+    #ifdef VERBOSE_THREAD
+      printf("[DEBUG->WS_TCALL] Writing %i Bytes to 0x%08x\n", items, stream);
+    #endif
+
+    err = pico->WriteStream(stream, In_Data, items);
+    if (err < 0) {
+      fprintf(stderr, "WriteStream error: %s\n", PicoErrors_FullError(err, ibuf, sizeof(ibuf)));
+      return (void *) -1;
+    }
+  } else if (type == RS) {
+    #ifdef VERBOSE_THREAD
+      #ifndef AVAILABLE
+        printf("[DEBUG->RS_TCALL] Reading %i Bytes to 0x%08x\n", items, stream);
+      #else
+        printf("[DEBUG->RS_TCALL] Reading %i Bytes to 0x%08x\n", i=pico->GetBytesAvailable(stream, true), stream);
+        if (i < 0){
+            fprintf(stderr, "GetBytesAvailable error: %s\n", PicoErrors_FullError(i, ibuf, sizeof(ibuf)));
+            exit(1);
+        }
+      #endif
+    #endif
+
+    #ifndef AVAILABLE
+      err = pico->ReadStream(stream, Out_Data, items);
+    #else
+      err = pico->ReadStream(stream, Out_Data, i);
+    #endif
+
+    if (err < 0) {
+      fprintf(stderr, "ReadingStream error: %s\n", PicoErrors_FullError(err, ibuf, sizeof(ibuf)));
+      return (void *) -1;
+    }
+  }
+}
 
 int main(int argc, char* argv[])
 {
+  printf("Begin...\r\n");
+  setlocale(LC_NUMERIC, ""); // for thounds seperator
+  float KB = SIZE * 4.0 / 1024;
+  float MB = KB         / 1024;
+  float GB = MB         / 1024;
+  printf("SIZE: %'5d Words, %'5d Bytes, %'5.1f KB, %'5.1f MB, %'5.1f GB\r\n", SIZE, SIZE * 4, KB, MB, GB);
+
   int         err, i, j, stream, stream100;
   int         room;
   int         *tmp = NULL;
@@ -64,47 +142,172 @@ int main(int argc, char* argv[])
       exit(1);
   }
 //==============================================================================
-  int *A = new int[SIZE * 4];
-  int *B = new int[SIZE * 4];
-  int *C = new int[SIZE * 4];
-  int *D = new int[SIZE * 4];
-  int *E = new int[SIZE * 4];
+  int *A = new int[SIZE];
+  int *B = new int[SIZE];
+  int *C = new int[SIZE];
+  int *D = new int[SIZE];
+  int *E = new int[SIZE];
 
 
-  for (i = 0; i < SIZE * 4; i++) {
+  for (i = 0; i < SIZE; i++) {
     A[i] = -2;
     B[i] = -2;
-    C[i] = -2;
-    D[i] = -2;
-    E[i] = -2;
+    C[i] = 0;
+    D[i] = 0;
+    E[i] = 0;
   }
 
   for (i = 0; i < SIZE; i++) {
-    A[i] = 70     -  i * 2;
-    B[i] = 70 - 1 -  i * 2;
+    A[i] = i * 2 + 0;
+    B[i] = i * 2 + 1;
   }
-  for (i = 0; i < SIZE; i++) {
-    A[SIZE + i] = 0xDEADBEEF;
-  }
-  for (i = 0; i < SIZE; i++) {
-    B[SIZE + i] = 0xDEADBEEF;
-  }
+
+  // for (i = 0; i < SIZE; i++) {
+  //   A[i] = 70     -  i * 2;
+  //   B[i] = 70 - 1 -  i * 2;
+  // }
+  // for (i = 0; i < SIZE; i++) {
+  //   A[SIZE + i] = 0xDEADBEEF;
+  // }
+  // for (i = 0; i < SIZE; i++) {
+  //   B[SIZE + i] = 0xDEADBEEF;
+  // }
 
   struct timeval start, end;
-  // gettimeofday(&start, NULL);
-  // for (i = 0; i < SIZE; i++) {
-  //   C[i] = A[i] + B[i];
-  // }
-  // gettimeofday(&end, NULL);
+  gettimeofday(&start, NULL);
+  for (i = 0; i < SIZE; i++) {
+    C[i] = A[i] + B[i];
+  }
+  gettimeofday(&end, NULL);
 
-  // int timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-  // printf("CPU %4d threads :\t%9d us\r\n", 1, timeuse);
+  int timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+  printf("CPU[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\r\n", j, MB, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
 
+  j = 0;
   int k;
   int node;
   uint32_t  cmd[4]; // {0xC1100000, 0xC1200000, 0xC1300001, 0xB1000000};
 //==================================================================================================
+  #ifdef TSTREAM
+    printf("Opening stream11\r\n");
+    stream11 = pico->CreateStream(11);
+    if (stream11 < 0) {
+        fprintf(stderr, "CreateStream error: %s\n", PicoErrors_FullError(stream11, ibuf, sizeof(ibuf)));
+        exit(1);
+    }
 
+    printf("Opening stream12\r\n");
+    stream12 = pico->CreateStream(12);
+    if (stream12 < 0) {
+        fprintf(stderr, "CreateStream error: %s\n", PicoErrors_FullError(stream12, ibuf, sizeof(ibuf)));
+        exit(1);
+    }
+
+    printf("Opening stream13\r\n");
+    stream13 = pico->CreateStream(13);
+    if (stream13 < 0) {
+        fprintf(stderr, "CreateStream error: %s\n", PicoErrors_FullError(stream13, ibuf, sizeof(ibuf)));
+        exit(1);
+    }
+    //----------------------------------------------------------------------------------------------
+    node = 1;
+    cmd[3] = 0xBABEFACE;
+    cmd[2] = 0xDEADBEEF;
+    cmd[1] = 0xDEADBEEF;
+    cmd[0] = 0xD000BEEF | (node << 24); // PR Start CMD
+    printf("0x%08x\r\n", cmd[0]);
+    pico->WriteStream(stream, cmd, 16);
+
+    #ifdef PR
+      printf("Doing PR: %d words, %dbytes\r\n", acc_vadd_PR1_bit_len, acc_vadd_PR1_bit_len * 4);
+      pico->WriteStream(stream100, acc_vadd_PR1_bit, acc_vadd_PR1_bit_len * 4);
+      usleep(500);
+      printf("PR Done\r\n");
+    #endif
+
+    cmd[0] = 0xD000DEAD | (node << 24); // PR End CMD
+    printf("0x%08x\r\n", cmd[0]);
+    pico->WriteStream(stream, cmd, 16);
+    //----------------------------------------------------------------------------------------------
+    cmd[0] = 0xC1100000 | (SIZE >> 16       ) ;
+    cmd[1] = 0xC1200000 | (SIZE & 0x0000FFFF) ;
+    cmd[2] = 0xC1300001                       ;
+    cmd[3] = 0xB1000111                       ;
+    pico->WriteStream(stream, cmd, 16);
+    //==========================================================================
+    pthread_t thread[3];
+    task_pk_t task_pkg[3];
+
+    // Package for write
+    task_pkg[0].Pico     = pico;
+    task_pkg[0].Type     = WS;
+    task_pkg[0].Stream   = stream11;
+    task_pkg[0].In_Data  = A;
+    task_pkg[0].Out_Data = NULL;
+    task_pkg[0].Size     = SIZE;
+
+    // Package for write
+    task_pkg[1].Pico     = pico;
+    task_pkg[1].Type     = WS;
+    task_pkg[1].Stream   = stream12;
+    task_pkg[1].In_Data  = B;
+    task_pkg[1].Out_Data = NULL;
+    task_pkg[1].Size     = SIZE;
+
+    // Package for read
+    task_pkg[2].Pico     = pico;
+    task_pkg[2].Type     = RS;
+    task_pkg[2].Stream   = stream13;
+    task_pkg[2].In_Data  = NULL;
+    task_pkg[2].Out_Data = D;
+    task_pkg[2].Size     = SIZE;
+
+    gettimeofday(&start, NULL);
+
+    pthread_create(&thread[2], NULL, Stream_Threads_Call, (void *)&task_pkg[2]);
+    pthread_create(&thread[1], NULL, Stream_Threads_Call, (void *)&task_pkg[1]);
+    pthread_create(&thread[0], NULL, Stream_Threads_Call, (void *)&task_pkg[0]);
+
+    pthread_join(thread[0], NULL);
+    pthread_join(thread[1], NULL);
+    pthread_join(thread[2], NULL);
+
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    printf("JIT[%4d] Size: %'10.2f MB\tExE Time: %'10d us\tThroughput: %'10.2f MB/s\t", j, MB, timeuse, ((SIZE * 4.0 / 1024 / 1024) / (timeuse * 1.0 / 1000000)));
+
+
+    // pico->WriteStream(stream11, A, SIZE * 4);
+    // pico->WriteStream(stream12, B, SIZE * 4);
+
+    // printf("%i B available to read from 13.\n", i=pico->GetBytesAvailable(stream13, true));
+    // if (i < 0){
+    //     fprintf(stderr, "GetBytesAvailable error: %s\n", PicoErrors_FullError(i, ibuf, sizeof(ibuf)));
+    //     exit(1);
+    // }
+    // pico->ReadStream(stream13, D, i);
+    //==========================================================================
+    int flag = 0;
+    printf("\r\n");
+    for (i = 0; i < SIZE; i++) {
+      // printf("[%3d]|\tA:%6d\t|B:%6d\t|C:%6d\t|D:%6d\t|E:%6d|\r\n", i, A[i], B[i], C[i], D[i], E[i]);
+      if (C[i] != D[i]) {
+        printf("Error!\r\n[%3d]|\tA:%6d\t|B:%6d\t|C:%6d\t|D:%6d\t|E:%6d|\r\n", i, A[i], B[i], C[i], D[i], E[i]);
+        flag = 1;
+        break;
+      }
+    }
+
+    if (flag == 0) printf("Passed\r\n");
+    printf("Closing stream11\r\n");
+    pico->CloseStream(stream11);
+    printf("Closing stream12\r\n");
+    pico->CloseStream(stream12);
+    printf("Closing stream13\r\n");
+    pico->CloseStream(stream13);
+  #endif
+//==================================================================================================
+#ifdef INSERTION
   printf("Opening stream11\r\n");
   stream11 = pico->CreateStream(11);
   if (stream11 < 0) {
@@ -292,6 +495,7 @@ int main(int argc, char* argv[])
   pico->CloseStream(stream32);
   printf("Closing stream33\r\n");
   pico->CloseStream(stream33);
+#endif
 //==================================================================================================
 //       _    ____ ____       _
 //      / \  / ___/ ___|  _  / |
