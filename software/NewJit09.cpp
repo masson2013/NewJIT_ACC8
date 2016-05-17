@@ -25,7 +25,7 @@ using namespace std;
 // 26214400  = 100 MBytes
 // FCCM Test:
 
-#define THREADS 16
+#define THREADS 1
 #define SIZE    1024 * 1024 / 4 * 128
 // #define SWSIZE  SIZE
 #define STEPS   1

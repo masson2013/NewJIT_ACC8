@@ -12,8 +12,8 @@
 
 using namespace std;
 
- #define VERBOSE
- #define VERBOSE_THREAD
+// #define VERBOSE
+// #define VERBOSE_THREAD
 // #define P_TEST
 #include "jit_isa.h"
 // 1024 * 10 * 1024
