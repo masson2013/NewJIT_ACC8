@@ -27,7 +27,8 @@ using namespace std;
 
 #define THREADS 1
 // #define SIZE    (MAX_SIZE + 32) * THREADS
-#define SIZE    1024 * 1024 * 50
+// #define SIZE    1024 * 1024 / 4
+#define SIZE 0x100000 / 4
 
 #define SWSIZE  SIZE
 #define STEPS   1
@@ -103,7 +104,7 @@ void * VMUL_Threads_Call(void *pk)
     printf("[DEBUG->task_thread:%2d] VNEW   : \t%'9d us\r\n", p->task_id, timeuse);
 
     gettimeofday(&start, NULL);
-    err =   vlpr(VM, nPR->at(0), VADD);                                                                                   errCheck(err, FUN_VLPR);
+    err =   vlpr(VM, nPR->at(0), BB);                                                                                   errCheck(err, FUN_VLPR);
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
     printf("[DEBUG->task_thread:%2d] VLPR   : \t%'9d us\r\n", p->task_id, timeuse);
@@ -253,19 +254,19 @@ int main(int argc, char* argv[])
 
   for (i = 0; i < 10; i++) {
     printf("%d:\tA:%d\tB:%d\tC:%d\tD:%d\r\n", i, A[i], B[i], C[i], D[i]);
-    if (C[i] != D[i]) {
-      printf("Error at %d:\tA:%d\tB:%d\tC:%d\tD:%d\r\nFailed!\r\n", i, A[i], B[i], C[i], D[i]);
-      VAM_VM_CLEAN(&VM);
-      delete[] A;
-      delete[] B;
-      delete[] C;
-      delete[] D;
-      exit(1);
-    }
+    // if (C[i] != D[i]) {
+    //   printf("Error at %d:\tA:%d\tB:%d\tC:%d\tD:%d\r\nFailed!\r\n", i, A[i], B[i], C[i], D[i]);
+    //   VAM_VM_CLEAN(&VM);
+    //   delete[] A;
+    //   delete[] B;
+    //   delete[] C;
+    //   delete[] D;
+    //   exit(1);
+    // }
   }
 
 
-  printf("Passed!\r\n");
+  printf("No Check!\r\n");
   VAM_VM_CLEAN(&VM);
   delete[] A;
   delete[] B;
@@ -274,50 +275,35 @@ int main(int argc, char* argv[])
   return 0;
 }
 
+
 /*
-
-
-  // for (i = 1; i <= CARD; i++) {
-  //   VM.VAM_TABLE->at(i * COL - 1).status = 1;
-  // }
-  // VAM_TABLE_SHOW(VM);
-  // VM.VAM_TABLE->at(0).status  = 0;
-  // VM.VAM_TABLE->at(1).status  = 0;
-  // VM.VAM_TABLE->at(2).status  = 0;
-  // VM.VAM_TABLE->at(3).status  = 0;
-  // VM.VAM_TABLE->at(4).status  = 1;
-
-  // VM.VAM_TABLE->at(5).status  = 0;
-  // VM.VAM_TABLE->at(6).status  = 0;
-  // VM.VAM_TABLE->at(7).status  = 0;
-  // VM.VAM_TABLE->at(8).status  = 0;
-  // VM.VAM_TABLE->at(9).status  = 1;
-
-  // VM.VAM_TABLE->at(10).status = 0;
-  // VM.VAM_TABLE->at(11).status = 0;
-  // VM.VAM_TABLE->at(12).status = 0;
-  // VM.VAM_TABLE->at(13).status = 0;
-  // VM.VAM_TABLE->at(14).status = 1;
-  //////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
+06/17/16, VADD
+================================================================================
+Begin...
+SIZE: 262,144 Words, 1,048,576 Bytes, 1,024.0 KB,   1.0 MB,   0.0 GB
+CPU    1 threads               :        264 us
+CPU TP                         :   3,787.88 MB/s
+[DEBUG->Download] Loading Static bit on 0 FPGA: './acc_static.bit' ...
+[DEBUG->task_thread: 0] VNEW   :        120 us
+[DEBUG->task_thread: 0] VLPR   :      6,743 us
+[DEBUG->task_thread: 0] VTIEIO :      3,023 us
+[DEBUG->task_thread: 0] VSTRAT :      2,874 us
+[DEBUG->task_thread: 0] TP     :     347.95 MB/s
+[DEBUG->task_thread: 0] VDEL   :         43 us
+JIT    1 threads               :     13,052 us
+JIT TP                         :      76.62 MB/s
+0:  A:1 B:1 C:2 D:2
+1:  A:2 B:2 C:4 D:4
+2:  A:3 B:3 C:6 D:6
+3:  A:4 B:4 C:8 D:8
+4:  A:5 B:5 C:10  D:10
+5:  A:6 B:6 C:12  D:12
+6:  A:7 B:7 C:14  D:14
+7:  A:8 B:8 C:16  D:16
+8:  A:9 B:9 C:18  D:18
+9:  A:10  B:10  C:20  D:20
+Passed!
 */
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 11/13/15, VADD, SIZE: 524880000 = 1.9 GBytes

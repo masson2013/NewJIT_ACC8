@@ -1,5 +1,5 @@
-TARGET = NewJit06
-USER_SOURCES =	NewJit06.cpp
+TARGET = NewJit11
+USER_SOURCES =	NewJit11.cpp
 
 include $(PICOBASE)/software/Makefile.common
 
