@@ -158,6 +158,19 @@ ipx::add_port_map TVALID [ipx::get_bus_interfaces $PNAME -of_objects [ipx::curre
 set_property physical_name $PNAME\_tvalid [ipx::get_port_maps TVALID -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
 ipx::add_port_map TDATA [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
 set_property physical_name $PNAME\_tdata [ipx::get_port_maps TDATA -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+
+set PNAME mRET
+set ACLK_NAME $ACLK_NAME:$PNAME
+ipx::add_bus_interface $PNAME [ipx::current_core]
+set_property abstraction_type_vlnv xilinx.com:interface:axis_rtl:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+set_property bus_type_vlnv xilinx.com:interface:axis:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+set_property interface_mode master [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+ipx::add_port_map TREADY [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+set_property physical_name $PNAME\_tready [ipx::get_port_maps TREADY -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+ipx::add_port_map TVALID [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+set_property physical_name $PNAME\_tvalid [ipx::get_port_maps TVALID -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+ipx::add_port_map TDATA [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+set_property physical_name $PNAME\_tdata [ipx::get_port_maps TDATA -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
 # ==================================================================================================
 set PORT_NAME_LIST {1 2 3 4 5 6 7 8}
 #####################################
@@ -206,7 +219,69 @@ for {set ii 0} {$ii < $LIST_LEN} {incr ii} \
   ipx::add_port_map TDATA [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
   set_property physical_name $PNAME\_tdata [ipx::get_port_maps TDATA -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
 }
+# ==================================================================================================
+set PORT_NAME_LIST {2 3 4 5 6 7 8}
+#####################################
+set LIST_LEN [llength $PORT_NAME_LIST]
+for {set ii 0} {$ii < $LIST_LEN} {incr ii} \
+{
+  set NUM [lindex $PORT_NAME_LIST $ii]
+  # ------------
+  set PNAME mACC_$NUM\A
+  set ACLK_NAME $ACLK_NAME:$PNAME
+  ipx::add_bus_interface $PNAME [ipx::current_core]
+  set_property abstraction_type_vlnv xilinx.com:interface:axis_rtl:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property bus_type_vlnv xilinx.com:interface:axis:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property interface_mode master [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property enablement_dependency \$NUM_ACCs>=[expr $NUM] [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  ipx::add_port_map TREADY [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tready [ipx::get_port_maps TREADY -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TVALID [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tvalid [ipx::get_port_maps TVALID -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TDATA [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tdata [ipx::get_port_maps TDATA -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
 
+  set PNAME mACC_$NUM\B
+  set ACLK_NAME $ACLK_NAME:$PNAME
+  ipx::add_bus_interface $PNAME [ipx::current_core]
+  set_property abstraction_type_vlnv xilinx.com:interface:axis_rtl:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property bus_type_vlnv xilinx.com:interface:axis:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property interface_mode master [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property enablement_dependency \$NUM_ACCs>=[expr $NUM] [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  ipx::add_port_map TREADY [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tready [ipx::get_port_maps TREADY -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TVALID [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tvalid [ipx::get_port_maps TVALID -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TDATA [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tdata [ipx::get_port_maps TDATA -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+
+  set PNAME mACC_$NUM\C
+  set ACLK_NAME $ACLK_NAME:$PNAME
+  ipx::add_bus_interface $PNAME [ipx::current_core]
+  set_property abstraction_type_vlnv xilinx.com:interface:axis_rtl:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property bus_type_vlnv xilinx.com:interface:axis:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property interface_mode master [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property enablement_dependency \$NUM_ACCs>=[expr $NUM] [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  ipx::add_port_map TREADY [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tready [ipx::get_port_maps TREADY -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TVALID [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tvalid [ipx::get_port_maps TVALID -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TDATA [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tdata [ipx::get_port_maps TDATA -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+
+  set PNAME sACC_$NUM\C
+  set ACLK_NAME $ACLK_NAME:$PNAME
+  ipx::add_bus_interface $PNAME [ipx::current_core]
+  set_property abstraction_type_vlnv xilinx.com:interface:axis_rtl:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property bus_type_vlnv xilinx.com:interface:axis:1.0 [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property enablement_dependency \$NUM_ACCs>=[expr $NUM] [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  ipx::add_port_map TREADY [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tready [ipx::get_port_maps TREADY -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TVALID [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tvalid [ipx::get_port_maps TVALID -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+  ipx::add_port_map TDATA [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]
+  set_property physical_name $PNAME\_tdata [ipx::get_port_maps TDATA -of_objects [ipx::get_bus_interfaces $PNAME -of_objects [ipx::current_core]]]
+}
 # ==================================================================================================
 set PORT_NAME_LIST {1 2 3 4 5 6 7 8}
 #####################################
@@ -258,7 +333,11 @@ for {set ii 0} {$ii < $LIST_LEN} {incr ii} \
 }
 
 set_property value ACTIVE_HIGH [ipx::get_bus_parameters POLARITY -of_objects [ipx::get_bus_interfaces rst -of_objects [ipx::current_core]]]
+ipx::add_bus_parameter ASSOCIATED_BUSIF [ipx::get_bus_interfaces ACLK -of_objects [ipx::current_core]]
 set_property value $ACLK_NAME [ipx::get_bus_parameters ASSOCIATED_BUSIF -of_objects [ipx::get_bus_interfaces ACLK -of_objects [ipx::current_core]]]
+
+sCMD:mACC_1A:mACC_1B:mACC_1C:sACC_1C:mACC_2A:mACC_2B:mACC_2C:sACC_2C:mACC_3A:mACC_3B:mACC_3C:sACC_3C:mACC_4A:mACC_4B:mACC_4C:sACC_4C:mACC_5A:mACC_5B:mACC_5C:sACC_5C:mACC_6A:mACC_6B:mACC_6C:sACC_6C:mACC_7A:mACC_7B:mACC_7C:sACC_7C:mACC_8A:mACC_8B:mACC_8C:sACC_8C:mRET
+
 
 set PORT_NAME_LIST {1 2 3 4 5 6 7 8}
 #####################################
@@ -298,20 +377,21 @@ set_property range 64K [get_bd_addr_segs {microblaze_0/Data/SEG_axi_uartlite_0_R
 set_property offset 0x42000000 [get_bd_addr_segs {microblaze_0/Data/SEG_axi_timer_0_Reg}]
 set_property range 64K [get_bd_addr_segs {microblaze_0/Data/SEG_axi_timer_0_Reg}]
 
-
 create_bd_cell -type ip -vlnv user.org:user:jit_switch:* jit_switch_0
-set_property -dict [list CONFIG.NUM_ACCs {2}] [get_bd_cells jit_switch_0]
+set_property -dict [list CONFIG.NUM_ACCs {8}] [get_bd_cells jit_switch_0]
 connect_bd_net [get_bd_pins jit_switch_0/ACLK] [get_bd_pins clk_wiz_1/clk_out1]
 connect_bd_net [get_bd_pins jit_switch_0/ARESETN] [get_bd_pins rst_clk_wiz_1_100M/peripheral_aresetn]
 
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:* axi_gpio_0
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config {Master "/microblaze_0 (Periph)" Clk "Auto" }  [get_bd_intf_pins axi_gpio_0/S_AXI]
 
+create_bd_cell -type ip -vlnv user.org:user:jit_ctrl:1.0 jit_ctrl_0
+set_property -dict [list CONFIG.NUM_ACCs {8}] [get_bd_cells jit_ctrl_0]
+connect_bd_net [get_bd_pins clk_wiz_1/clk_out1] [get_bd_pins jit_ctrl_0/ACLK]
+connect_bd_net [get_bd_pins rst_clk_wiz_1_100M/peripheral_aresetn] [get_bd_pins jit_ctrl_0/ARESETN]
 
-
-
-# set PORT_NAME_LIST {1 2 3 4 5 6 7 8}
-set PORT_NAME_LIST {1 2}
+set PORT_NAME_LIST {1 2 3 4 5 6 7 8}
+# set PORT_NAME_LIST {1 2}
 #####################################################################################################
 set LIST_LEN [llength $PORT_NAME_LIST]
 for {set ii 0} {$ii < $LIST_LEN} {incr ii} \
@@ -361,6 +441,11 @@ for {set ii 0} {$ii < $LIST_LEN} {incr ii} \
   connect_bd_net [get_bd_pins axi_gpio_0/gpio_io_o] [get_bd_pins sgen_$NUM\A/arg1_V]
   connect_bd_net [get_bd_pins axi_gpio_0/gpio_io_o] [get_bd_pins sgen_$NUM\B/arg1_V]
 
+  connect_bd_intf_net [get_bd_intf_pins sgen_$NUM\A/CMD_V] [get_bd_intf_pins jit_ctrl_0/mACC_$NUM\A]
+  connect_bd_intf_net [get_bd_intf_pins sgen_$NUM\B/CMD_V] [get_bd_intf_pins jit_ctrl_0/mACC_$NUM\B]
+  connect_bd_intf_net [get_bd_intf_pins sget_$NUM\C/CMD_V] [get_bd_intf_pins jit_ctrl_0/mACC_$NUM\C]
+  connect_bd_intf_net [get_bd_intf_pins sget_$NUM\C/RSP_V] [get_bd_intf_pins jit_ctrl_0/sACC_$NUM\C]
+
   connect_bd_net [get_bd_pins clk_wiz_1/clk_out1] [get_bd_pins sgen_$NUM\A/ap_clk]
   connect_bd_net [get_bd_pins clk_wiz_1/clk_out1] [get_bd_pins sgen_$NUM\B/ap_clk]
   connect_bd_net [get_bd_pins clk_wiz_1/clk_out1] [get_bd_pins sget_$NUM\C/ap_clk]
@@ -385,7 +470,15 @@ for {set ii 0} {$ii < $LIST_LEN} {incr ii} \
 }
 #####################################################################################################
 
+set_property -dict [list CONFIG.C_FSL_LINKS {2}] [get_bd_cells microblaze_0]
+connect_bd_intf_net [get_bd_intf_pins microblaze_0/M1_AXIS] [get_bd_intf_pins jit_ctrl_0/sCMD]
+connect_bd_intf_net [get_bd_intf_pins microblaze_0/S1_AXIS] [get_bd_intf_pins jit_ctrl_0/mRET]
 
+create_bd_cell -type ip -vlnv user.org:user:sm_timer_64:1.0 sm_timer_64_0
+connect_bd_net [get_bd_pins clk_wiz_1/clk_out1] [get_bd_pins sm_timer_64_0/ACLK]
+connect_bd_net [get_bd_pins rst_clk_wiz_1_100M/peripheral_aresetn] [get_bd_pins sm_timer_64_0/ARESETN]
+connect_bd_intf_net [get_bd_intf_pins sm_timer_64_0/mRet] [get_bd_intf_pins microblaze_0/S0_AXIS]
+connect_bd_intf_net [get_bd_intf_pins sm_timer_64_0/sCMD] [get_bd_intf_pins microblaze_0/M0_AXIS]
 
 
 
